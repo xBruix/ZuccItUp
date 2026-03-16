@@ -5,6 +5,17 @@
  * Main file for user interaction, command-line interface, and Server instance
  */
 
+/* 
+TODO: Enter location
+TODO: List vendors
+TODO: Select Vendor
+TODO: Menu
+TODO: Loop
+	TODO: Add to Cart
+	TODO: Evaluate subtotal
+TODO: Place order
+TODO: Confirm order or decline and try again
+*/
 
 #include "../include/server.hpp"
 #include <unistd.h>		// for getpass()
@@ -141,8 +152,9 @@ int main() {
 	<< "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣼⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣷⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n";
 	cout << "\nWelcome to Zucc It Up!\n\n";
 
-	// Get credentials for Oracle database
+	//* Get credentials for Oracle database
 	cout << "First, you will need to enter your Oracle Database credentials.\n";
+	cout << "Type 'Q' at any time to quit the program.\n";
 	string oracle_username;
 	string oracle_password;
 	do {
