@@ -19,3 +19,6 @@ venv.bak/
 
 # ignore vscode stuff
 .vscode
+
+# ignore Pycharm stuff
+.idea
