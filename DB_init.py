@@ -15,6 +15,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 7:30am - 10:30am"
     ],
+    "location" : "Lower Cafe",
     "menuItem": [
         # Classic Hot Breakfasts
         {
@@ -205,6 +206,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 11:00am - 2:00pm"
     ],
+    "location" : "Lower Cafe",
     "menuItem": [
         # Made-to-Order Burgers (expanded)
         {
@@ -480,6 +482,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 7:30am - 9:30am"
     ],
+    "location" : "Upper Cafe",
     "menuItem": [
         # Muffins (expanded)
         {
@@ -647,6 +650,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 10:30am - 4:00pm"
     ],
+    "location" : "Upper Cafe",
     "menuItem": [
         # Chicken Strips
         {
@@ -866,6 +870,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 4:00pm - 7:00pm"
     ],
+    "location" : "Upper Cafe",
     "menuItem": [
         # Monday Specials (In Stock)
         {
@@ -993,6 +998,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Friday: 7:00am - 7:00pm"
     ],
+    "location" : "Upper Cafe",
     "menuItem": [
         # Coffee
         {
@@ -1278,6 +1284,7 @@ menu.insert_one({
     "schedule": [
         "Monday-Saturday: 11:00am - 8:00pm"
     ],
+    "location" : "Hot Dog",
     "menuItem": [
         # Signature Hot Dogs
         {
