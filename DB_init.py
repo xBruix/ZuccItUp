@@ -1479,7 +1479,7 @@ order.insert_one({
     "building": "210",
     "room": "115",
     "subTotal": 13.50, 
-    "orderStatus": "Complete",
+    "orderStatus": "Received",
     "orderTime": 1100,           #  Integer format: HHMM (11:00 AM)
     "readyTime": 1107,           #  11:07 AM
     "acceptTime": 1107,          #  11:07 AM
@@ -1528,6 +1528,7 @@ document_list = [
             "Chicken Strips", "Tea", "Monster", "Danish", 
         ]
     }
+
     ]
 
 user.insertMany([document_list])
