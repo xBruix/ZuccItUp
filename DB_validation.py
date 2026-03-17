@@ -7,8 +7,6 @@ uri = f"mongodb://{username}:{password}@studb-mongo.csci.viu.ca:27017/{username}
 client = MangoClient(uri)
 
 db = client.get_database(username + "_project")
-# menu = db.get_collection("menu")	# collection
-# order = db.get_collection("order")
 
 try:
     db.drop_collection("menu")
@@ -49,7 +47,7 @@ db.create_collection("user", validator={
                 "enum": ["agent", "customer", "vendor"]  
             },
 
-            "availibilityStatus": {
+            "availabilityStatus": {
                 "bsonType": "bool"
             },
 
@@ -68,13 +66,27 @@ db.create_collection("user", validator={
             "schedule": {
                 "bsonType": "array",
                 "items": {
-                    "bsonType": "string" }}}}}
+                    "bsonType": "object",
+                    "properties": {
+                        "day": {
+                            "bsonType": "string",
+                            "enum": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                        },
+                        "startTime": {
+                            "bsonType": "date"
+                        },
+                        "endTime": {
+                            "bsonType": "date"
+                        },
+                    }
+                },
+            }}}}
 )
 
 db.create_collection("menu", validator={ 
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["type", "publishStatus"],
+        "required": ["type"],
         "properties": {
             "type": {
                 "bsonType": "string",
@@ -84,13 +96,25 @@ db.create_collection("menu", validator={
             "schedule": {
                 "bsonType": "array",
                 "items": {
-                    "bsonType": "string"
-                }
+                    "bsonType": "object",
+                    "properties": {
+                        "day": {
+                            "bsonType": "string",
+                            "enum": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                        },
+                        "startTime": {
+                            "bsonType": "date"
+                        },
+                        "endTime": {
+                            "bsonType": "date"
+                        },
+                    }
+                },
             },
 
-            "publishStatus": {
-                "bsonType": "bool"
-            },
+            # "publishStatus": {
+            #     "bsonType": "bool"
+            # },
 
             "menuItem": {
                 "bsonType": "array",
@@ -144,7 +168,8 @@ db.create_collection("order", validator={
             },
 
             "orderStatus": {
-                "bsonType": "string"
+                "bsonType": "string",
+                "enum": ["pending", "ready_for_pickup", "in_transit", "delivered", "received"]
             },
 
             "orderTime": {  
@@ -193,11 +218,13 @@ db.create_collection("order", validator={
                     "bsonType": "object",
                     "properties": {
                         "name": {
-                            "bsonType": "string"
+                            "bsonType": "string",
                         },
 
                         "qty": {
-                            "bsonType": "int" }}}}}}}
+                            "bsonType": "int",
+                            "minimum": 0,
+                        }}}}}}}
 )
 
 client.close()

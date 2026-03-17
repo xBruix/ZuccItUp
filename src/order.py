@@ -73,7 +73,7 @@ class Time(Enum):
 # Short enum class for order status:
 class Status(Enum):
 	# Not quite sure how to do this, but here's some ideas:
-	# WAITING = "WAITING"	# waiting for agent to accept the order
+	# PENDING = "PENDING"	# waiting for agent to accept the order
 	# READY_FOR_PICKUP = "READY_FOR_PICKUP"
 	# IN_TRANSIT = "IN_TRANSIT"
 	# DELIVERED = "DELIVERED"
