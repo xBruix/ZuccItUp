@@ -1,12 +1,16 @@
+from datetime import datetime
 from pymongo import MongoClient as MangoClient	# will this work?
 import getpass
 
+name = input("Enter monogoDB username \n")
+
 password = getpass.getpass("Enter your Mango password:\n> ")
-uri = f"mongodb://bronnc:{password}@studb-mongo.csci.viu.ca:27017/bronnc_project?authSource=admin"
+uri = f"mongodb://" + name + ":{password}@studb-mongo.csci.viu.ca:27017/" + name + "_project?authSource=admin"
 client = MangoClient(uri)
 
-db = client.get_database("bronnc_project")
+db = client.get_database(name + "_project")
 menu = db.get_collection("menu")	# collection
+order = db.get_collection("order")  
 
 # Lower Cafe - Breakfast Menu (7:30am - 10:30am)
 menu.insert_one({
@@ -1471,4 +1475,28 @@ menu.insert_one({
     ]
 })
 
+
+order.insert_one({
+    "building": "210",
+    "room": "115",
+    "subTotal": 13.50, 
+    "orderStatus": "Complete",
+    "orderTime": 1100,           #  Integer format: HHMM (11:00 AM)
+    "readyTime": 1107,           #  11:07 AM
+    "acceptTime": 1107,          #  11:07 AM
+    "deliveryTime": 1115,        #  11:15 AM
+    "pickupTime": 1110,          #  11:10 AM
+    "agent": "Kyle",
+    "vendor": "Upper Cafe",
+    "cartItem": [                
+        {
+            "name": "Chicken Strips",
+            "qty": 1
+        },
+        {
+            "name": "Coffee",
+            "qty": 1
+        }
+    ]
+})
 client.close()

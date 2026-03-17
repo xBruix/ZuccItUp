@@ -32,3 +32,7 @@ You can also run `ls` to list everything in your current directory, and you shou
 `pip install -r requirements.txt`
 
 You are now able to run _pymongo_! I mean _pymango_!
+
+#### 4. Apply schema validation
+Run DB_validation.py to apply a schema validation to the database. 
+
