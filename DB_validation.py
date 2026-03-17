@@ -105,7 +105,7 @@ db.create_collection("menu", validator={
                             "bsonType": "string" }}}}}}}
 )
 
-db.create__collection("order", validator={
+db.create_collection("order", validator={
      "$jsonSchema": {  
         "bsonType": "object",
         "required": [],
