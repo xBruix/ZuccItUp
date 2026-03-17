@@ -2,7 +2,7 @@ from datetime import datetime
 from pymongo import MongoClient as MangoClient	# will this work?
 import getpass
 
-name = input("Enter monogoDB username \n")
+name = input("Enter mongoDB username \n")
 
 password = getpass.getpass("Enter your Mango password:\n> ")
 uri = f"mongodb://" + name + ":{password}@studb-mongo.csci.viu.ca:27017/" + name + "_project?authSource=admin"
@@ -11,6 +11,7 @@ client = MangoClient(uri)
 db = client.get_database(name + "_project")
 menu = db.get_collection("menu")	# collection
 order = db.get_collection("order")  
+user = db.get_collection("user")
 
 # Lower Cafe - Breakfast Menu (7:30am - 10:30am)
 menu.insert_one({
@@ -1279,8 +1280,6 @@ menu.insert_one({
     ]
 })
 
-
-
 # Unleashed Hot Dogs - All Day Menu
 menu.insert_one({
     "type": "General",
@@ -1480,7 +1479,7 @@ order.insert_one({
     "building": "210",
     "room": "115",
     "subTotal": 13.50, 
-    "orderStatus": "Complete",
+    "orderStatus": "Received",
     "orderTime": 1100,           #  Integer format: HHMM (11:00 AM)
     "readyTime": 1107,           #  11:07 AM
     "acceptTime": 1107,          #  11:07 AM
@@ -1499,4 +1498,39 @@ order.insert_one({
         }
     ]
 })
+
+
+document_list = [
+    {
+        "name":"Kyle",
+        "email" : "losermgee@viu.ca",
+        "role" : "customer",
+        "VIUID" : "123456789",
+        "previouslyOrdered" : [
+            "Chicken Strips", "Coffee", "Monster", "Hot Dog"
+        ]
+    },
+    {
+        "name": "Surya",
+        "email" : "suryaB@gmail.com",
+        "role" : "customer",
+        "VIUID" : "128529353",
+        "previouslyOrdered" : [
+            "Chocolate Chip Muffin", "The New Yorker", "Monster", "The Hawaiian", "Plain Bagel","Diet Coke"
+        ]
+    },
+    {
+        "name":"Bruce",
+        "email" : "bigBruce@viu.ca",
+        "role" : "customer",
+        "VIUID" : "752973458",
+        "previouslyOrdered" : [
+            "Chicken Strips", "Tea", "Monster", "Danish", 
+        ]
+    }
+
+    ]
+
+user.insertMany([document_list])
+
 client.close()
