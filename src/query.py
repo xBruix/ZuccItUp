@@ -1,7 +1,11 @@
 #This document will contain all the queries to be used by the application
 
 #Displays menu types and location and items
-def display_menu_type(menu_type,location):
+#──────────────────────────────────────────────
+def display_menu_type():
+    
+    menu_type = input("Enter the menu type (or press Enter to skip): ").strip()
+    location = input("Enter location of menu (or press Enter to skip): ").strip()
     
     #menu_type = input("Enter the menu type (or press Enter to skip): ").strip()
     #location = input("Enter location of menu (or press Enter to skip): ").strip()
@@ -27,8 +31,9 @@ If user enters both → queries both: {"type": "Breakfast", "location": "Upper C
 If user enters only type → queries type: {"type": "Breakfast"}
 If user enters only location → queries location: {"location": "Upper Cafe"}
 If user enters neither → queries all: {}"""
-
+#──────────────────────────────────────────────
 #Display a menu item using search by name (enter the name of the food item to display)
+#──────────────────────────────────────────────
 def find_menu_item(item_name):
     """
     Search for a menu item by name across all menus
@@ -53,8 +58,9 @@ def find_menu_item(item_name):
     if items:
         return items[0] 
     return None
-
+#──────────────────────────────────────────────
 #Simple order placement function will need more features such as subtotal and more qty
+#──────────────────────────────────────────────
 def place_order():
    
     customer_name = input("\nEnter your name: ").strip()
