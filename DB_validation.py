@@ -69,7 +69,7 @@ db.create_collection("user", validator={
                 "properties": {
                     "days": {
                         "bsonType": "string",
-                        "pattern": "\w\w\w-\w\w\w",     # Must be in 3-letter format like this: Mon-Fri
+                        "pattern": "\\w\\w\w-\\w\\w\\w",     # Must be in 3-letter format like this: Mon-Fri
                     },
                     "startTime": {
                         "bsonType": "string",
