@@ -6,7 +6,10 @@ class Notification():
         self.heading = heading
 
     def sendNotification(self):
-        pass
+       pass
 
     def viewNotification(self):
-        pass
+        print("─" * 55)
+        print("Here is your notification from monogodb")
+        print("Here is your notification from mangodb")
+        print("─" * 55)
