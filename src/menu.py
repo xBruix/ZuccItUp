@@ -5,10 +5,25 @@ class Menu():
         self.schedule = schedule
         self.publishStatus = publishStatus
 
-    def viewMenu(self):
-        pass
+    def __viewMenu(self):
+
+        keyword = input("Search keyword (leave blank for all): ").strip() #//Input search term
+        query = {"Type": True} #checking if the menu type is there
+        if keyword:
+            #query["name"] = {"$regex": keyword} #search for the menu type query=menu
+            items = list(db.items.find(query)) #gives the list of menu items
+        if not items:
+            print("No items found.")
+            return
+        print(f"\n{'#':<4} {'Name':<15} {'Price':>8}  Description") #printing the menu?
+        print("─" * 55) #spacing
+        for i, item in enumerate(items, 1): 
+            print(f"{i:<4} {item['name']:<15} ${item['price']:>7.2f}  {item['description']}")
+            #//looping through the list of menuitems
+        
 
     def viewAllMenus(self):
+
         pass
 
 class MenuItem():
@@ -23,8 +38,16 @@ class MenuItem():
     def addToCart(self):
         pass
 
-    def viewItem(self):
+    def viewItem(self): 
         pass
 
     def viewAllItems(self):
-        pass
+        # pseudocode needs database implementation
+        orders = list(db.orders.find()) # list of orders from db
+        if not orders:
+            print("You have no orders yet.")
+            return
+        for order in orders: 
+            print("__" * 25)
+            print("") #the actual order
+            print("__" * 25)

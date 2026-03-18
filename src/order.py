@@ -18,8 +18,9 @@ class Cart:
 		#   ...
 		# }
 		self.__cart_items = {}
-
-	# Getters
+#──────────────────────────────────────────────
+# Getters
+#──────────────────────────────────────────────
 	def get_location(self) -> tuple:
 		# Tuple data type in Python is an ordered, unchangeable array of data
 		# See: https://www.w3schools.com/python/python_tuples.asp
@@ -34,8 +35,9 @@ class Cart:
 	# Setters
 	def set_location(self, building: str, room: str):
 		pass
-
-	# Other functions
+#──────────────────────────────────────────────
+# Other functions
+#──────────────────────────────────────────────
 	def add_to_cart(self, menu_item: str, quantity: int):
 		pass
 
@@ -56,10 +58,13 @@ class Cart:
 
 	def convert_to_orders(self):
 		pass
+#──────────────────────────────────────────────
 # End of Cart
+#──────────────────────────────────────────────
 
-
+#──────────────────────────────────────────────
 # Short enum class for order times:
+#──────────────────────────────────────────────
 class Time(Enum):
 	ORDER = "ORDER"
 	READY = "READY"
@@ -67,10 +72,14 @@ class Time(Enum):
 	PICKUP = "PICKUP"
 	DELIVERY = "DELIVERY"
 	CONFIRMATION = "CONFIRMATION"
+#──────────────────────────────────────────────
 # End of Time class
+#──────────────────────────────────────────────
 
 
+#──────────────────────────────────────────────
 # Short enum class for order status:
+#──────────────────────────────────────────────
 class Status(Enum):
 	# Not quite sure how to do this, but here's some ideas:
 	# PENDING = "PENDING"	# waiting for agent to accept the order
@@ -79,7 +88,9 @@ class Status(Enum):
 	# DELIVERED = "DELIVERED"
 	# RECEIVED = "RECEIVED"
 	pass
+#──────────────────────────────────────────────
 # End of Status class
+#──────────────────────────────────────────────
 
 
 class Order:
@@ -99,8 +110,9 @@ class Order:
 		self.__pickup_time = ""
 		self.__delivery_time = ""
 		self.__confirmation_time = ""
-
-	# Getters
+#──────────────────────────────────────────────
+# Getters
+#──────────────────────────────────────────────
 	def get_location(self) -> tuple:
 		return self.__building, self.__room
 
@@ -128,12 +140,15 @@ class Order:
 			return self.__confirmation_time
 		else:
 			raise ValueError("Unknown time ENUM")
-
-	# Setters
+#──────────────────────────────────────────────
+# Setters
+#──────────────────────────────────────────────
 	def set_instructions(self, instructions: str):
 		self.__special_instructions = instructions
 
-	# Other functions
+#──────────────────────────────────────────────
+# Other functions
+#──────────────────────────────────────────────
 	def update_status(self, status: Type[Status]):
 		pass
 
@@ -151,4 +166,6 @@ class Order:
 
 	def view_all_orders(self) -> list[dict]:
 		pass
+#──────────────────────────────────────────────
 # End of Order
+#──────────────────────────────────────────────
