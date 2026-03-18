@@ -1598,24 +1598,6 @@ document_list = [
         "role": "agent",
         "VIUID": "111222333",
         "availabilityStatus": True,  # Currently available
-        "location": "Main Campus",
-        "schedule": [
-            {
-                "day": "Mon",
-                "startTime": datetime(2026, 1, 1, 9, 0, 0),   # 9:00 AM
-                "endTime": datetime(2026, 1, 1, 17, 0, 0)     # 5:00 PM
-            },
-            {
-                "day": "Wed",
-                "startTime": datetime(2026, 1, 1, 9, 0, 0),
-                "endTime": datetime(2026, 1, 1, 17, 0, 0)
-            },
-            {
-                "day": "Fri",
-                "startTime": datetime(2026, 1, 1, 9, 0, 0),
-                "endTime": datetime(2026, 1, 1, 17, 0, 0)
-            }
-        ],
         "previouslyOrdered": []
     },
     {
@@ -1624,24 +1606,6 @@ document_list = [
         "role": "agent",
         "VIUID": "222333444",
         "availabilityStatus": True,
-        "location": "Building 200",
-        "schedule": [
-            {
-                "day": "Mon",
-                "startTime": datetime(2026, 1, 1, 8, 0, 0),   # 8:00 AM
-                "endTime": datetime(2026, 1, 1, 16, 0, 0)     # 4:00 PM
-            },
-            {
-                "day": "Tue",
-                "startTime": datetime(2026, 1, 1, 8, 0, 0),
-                "endTime": datetime(2026, 1, 1, 16, 0, 0)
-            },
-            {
-                "day": "Thu",
-                "startTime": datetime(2026, 1, 1, 8, 0, 0),
-                "endTime": datetime(2026, 1, 1, 16, 0, 0)
-            }
-        ],
         "previouslyOrdered": ["Coffee"]
     },
     {
@@ -1650,24 +1614,6 @@ document_list = [
         "role": "agent",
         "VIUID": "333444555",
         "availabilityStatus": False,  # Currently not available
-        "location": "Downtown Campus",
-        "schedule": [
-            {
-                "day": "Tue",
-                "startTime": datetime(2026, 1, 1, 10, 0, 0),  # 10:00 AM
-                "endTime": datetime(2026, 1, 1, 18, 0, 0)     # 6:00 PM
-            },
-            {
-                "day": "Thu",
-                "startTime": datetime(2026, 1, 1, 10, 0, 0),
-                "endTime": datetime(2026, 1, 1, 18, 0, 0)
-            },
-            {
-                "day": "Sat",
-                "startTime": datetime(2026, 1, 1, 11, 0, 0),  # 11:00 AM
-                "endTime": datetime(2026, 1, 1, 15, 0, 0)     # 3:00 PM
-            }
-        ],
         "previouslyOrdered": []
     },
     {
@@ -1676,34 +1622,6 @@ document_list = [
         "role": "agent",
         "VIUID": "444555666",
         "availabilityStatus": True,
-        "location": "Building 185",
-        "schedule": [
-            {
-                "day": "Mon",
-                "startTime": datetime(2026, 1, 1, 7, 30, 0),  # 7:30 AM
-                "endTime": datetime(2026, 1, 1, 15, 30, 0)    # 3:30 PM
-            },
-            {
-                "day": "Tue",
-                "startTime": datetime(2026, 1, 1, 7, 30, 0),
-                "endTime": datetime(2026, 1, 1, 15, 30, 0)
-            },
-            {
-                "day": "Wed",
-                "startTime": datetime(2026, 1, 1, 7, 30, 0),
-                "endTime": datetime(2026, 1, 1, 15, 30, 0)
-            },
-            {
-                "day": "Thu",
-                "startTime": datetime(2026, 1, 1, 7, 30, 0),
-                "endTime": datetime(2026, 1, 1, 15, 30, 0)
-            },
-            {
-                "day": "Fri",
-                "startTime": datetime(2026, 1, 1, 7, 30, 0),
-                "endTime": datetime(2026, 1, 1, 15, 30, 0)
-            }
-        ],
         "previouslyOrdered": ["Breakfast Burrito", "Coffee"]
     },
     {
@@ -1712,24 +1630,6 @@ document_list = [
         "role": "agent",
         "VIUID": "555666777",
         "availabilityStatus": True,
-        "location": "Main Campus",
-        "schedule": [
-            {
-                "day": "Mon",
-                "startTime": datetime(2026, 1, 1, 11, 0, 0),  # 11:00 AM
-                "endTime": datetime(2026, 1, 1, 19, 0, 0)     # 7:00 PM
-            },
-            {
-                "day": "Wed",
-                "startTime": datetime(2026, 1, 1, 11, 0, 0),
-                "endTime": datetime(2026, 1, 1, 19, 0, 0)
-            },
-            {
-                "day": "Fri",
-                "startTime": datetime(2026, 1, 1, 11, 0, 0),
-                "endTime": datetime(2026, 1, 1, 19, 0, 0)
-            }
-        ],
         "previouslyOrdered": ["Pizza", "Monster"]
     },
     {
@@ -1738,26 +1638,44 @@ document_list = [
         "role": "agent",
         "VIUID": "666777888",
         "availabilityStatus": False,
-        "location": "Building 210",
-        "schedule": [
-            {
-                "day": "Tue",
-                "startTime": datetime(2026, 1, 1, 12, 0, 0),  # 12:00 PM
-                "endTime": datetime(2026, 1, 1, 20, 0, 0)     # 8:00 PM
-            },
-            {
-                "day": "Thu",
-                "startTime": datetime(2026, 1, 1, 12, 0, 0),
-                "endTime": datetime(2026, 1, 1, 20, 0, 0)
-            },
-            {
-                "day": "Sat",
-                "startTime": datetime(2026, 1, 1, 10, 0, 0),  # 10:00 AM
-                "endTime": datetime(2026, 1, 1, 18, 0, 0)     # 6:00 PM
-            }
-        ],
         "previouslyOrdered": []
-    }
+    },
+    {
+        "name": "Upper Cafe",
+        "email": "uppercafe@viu.ca",
+        "role": "vendor",
+        "VIUID": "8765437898",
+        "location": "Building 300",
+        "hoursOfOperation": {
+            "days": "Mon-Fri",
+            "startTime": "07:30",
+        "endTime": "16:00"
+        }
+    },
+    {
+        "name": "Lower Cafe",
+        "email": "lowercafe@viu.ca",
+        "role": "vendor",
+        "VIUID": "8765437998",
+        "location": "Building 185",
+        "hoursOfOperation": {
+            "days": "Mon-Fri",
+            "startTime": "07:30",
+            "endTime": "14:00"
+        }
+    },
+    {
+        "name": "Unleashed Dogs",
+        "email": "unleaseddogs@dog.ca",
+        "role": "vendor",
+        "VIUID": "111111111",
+        "location": "Royal Bank Plaza",
+        "hoursOfOperation": {
+            "days": "Tue-Thu",
+            "startTime": "10:00",
+            "endTime": "14:00"
+        }
+    }    
     }]
 
 user.insertMany([document_list])
