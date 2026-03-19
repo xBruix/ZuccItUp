@@ -1,0 +1,79 @@
+#See code plan in A6 document for details on each function
+
+#user functions
+def verify_user(viu_ID):
+
+    is_valid = false
+
+    return is_valid
+
+def create_user(email,name,viu_ID,role):
+
+    return
+
+def deactivate_user(viu_ID):
+
+    return
+
+def view_user(viu_ID):
+
+    return
+
+
+#menu functions 
+def get_vendors():
+
+    return
+
+def get_all_menu(vendorID):
+
+    return
+
+def get_one_menu(menuID):
+
+    return
+
+def get_menu_item(menuItemID):
+
+    return
+
+#order functions
+def create_order(building,room,subtotal,instructions,customer,vendor,cart):
+
+    return
+
+def get_order(orderID):
+
+    return
+
+def get_order_by_user(userID):
+
+    return
+
+def add_agent_to_order():
+
+    return
+
+def update_orderTime(time,orderID):
+
+    return
+
+def update_readyTime(time,orderID):
+
+    return
+
+def update_acceptTime(time,orderID):
+
+    return
+
+def update_pickupTime(time,orderID):
+
+    return
+
+def update_deliveryTime(time,orderID):
+
+    return
+
+def update_confirmationTime(time,orderID):
+
+    return
