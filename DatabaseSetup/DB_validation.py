@@ -47,6 +47,10 @@ db.create_collection("user", validator={
                 "bsonType": "string",
                 "enum": ["Agent", "Customer", "Vendor"]
             },
+            "active":{
+                "bsonType": "bool",
+                "description" : "Marks if the account is active or not"
+            },
             # Only used by Delivery Agent
             "availabilityStatus": {
                 "bsonType": "bool"
