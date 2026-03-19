@@ -94,7 +94,7 @@ class MenuItem():
         self.inStock = inStock
         self.allergens = allergens
 
-    def addToCart(self,cart):
+    def __addToCart(self,cart):
         if not self.inStock: 
             print(f"Sorry, '{self.name}' is currently out of stock.") #no stock means no add cart
             return
