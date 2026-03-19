@@ -1,14 +1,23 @@
 from pymongo import MongoClient as MangoClient	# will this work?
 import getpass
 
-name = input("Enter mongoDB username \n")
-
-password = getpass.getpass("Enter your Mango password:\n> ")
-uri = f"mongodb://" + name + ":{password}@studb-mongo.csci.viu.ca:27017/" + name + "_project?authSource=admin"
+username = input("Enter you Mango username: ")
+password = getpass.getpass("Enter your Mango password: ")
+uri = f"mongodb://{username}:{password}@studb-mongo.csci.viu.ca:27017/{username}_project?authSource=admin"
 client = MangoClient(uri)
 
-db = client.get_database(name + "_project")
+db = client.get_database(f"{username}_project")
 user = db.get_collection("user")
+
+# Clear database to avoid duplicates
+filter = {
+	"name": {
+		"$in": ["Lower Cafeteria", "Upper Cafeteria", "Unleashed Hot Dogs",
+				"Dr. Sarah Elizabeth Carruthers", "Caleb Bronn", "Keenan Wolfe",
+				"Bruce Fernandes", "Surya Balram"]
+	}
+}
+user.delete_many(filter)
 
 # Vendors
 lower_caf = {
@@ -51,6 +60,7 @@ unleashed_hot_dogs = {
 }
 
 user.insert_many([lower_caf, upper_caf, unleashed_hot_dogs])
+print("Vendors inserted into the database")
 
 # Customers
 dr_sarah = {
@@ -78,22 +88,24 @@ caleb = {
 }
 
 user.insert_many([dr_sarah, keenan, caleb])
+print("Customers inserted into the database")
 
 # Delivery Agents
 bruce = {
 	"name": "Bruce Fernandes",
 	"email": "Bruixisawesome@gmail.com",
 	"VIUID": "777888999",
-	"role": "Customer",
-	"availabilityStatus": True,
+	"role": "Agent",
+	"availabilityStatus": False,
 }
 
 surya = {
 	"name": "Surya Balram",
 	"email": "suryasgotgame@hotmail.com",
 	"VIUID": "123123123",
-	"role": "Customer",
+	"role": "Agent",
 	"availabilityStatus": True,
 }
 
 user.insert_many([bruce, surya])
+print("Delivery Agents inserted into the database")

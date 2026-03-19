@@ -1,12 +1,12 @@
 from pymongo import MongoClient as MangoClient	# will this work?
 import getpass
 
-username = input("Enter you Mango username:\n> ")
-password = getpass.getpass("Enter your Mango password:\n> ")
+username = input("Enter you Mango username: ")
+password = getpass.getpass("Enter your Mango password: ")
 uri = f"mongodb://{username}:{password}@studb-mongo.csci.viu.ca:27017/{username}_project?authSource=admin"
 client = MangoClient(uri)
 
-db = client.get_database(username + "_project")
+db = client.get_database(f"{username}_project")
 
 try:
     db.drop_collection("menu")
@@ -24,7 +24,7 @@ except:
 db.create_collection("user", validator={ 
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["name", "email", "role", "VIUID"],
+        "required": ["name", "email", "VIUID", "role"],
         "properties": {
             # REQUIRED for all user types
             "name": {
@@ -33,14 +33,14 @@ db.create_collection("user", validator={
             # REQUIRED for all user types
             "email": {
                 "bsonType": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
             },
             # REQUIRED for all user types
             "VIUID": {
                 "bsonType": "string",  
                 "minLength": 9,
                 "maxLength": 9,
-                "pattern": "^[0-9]{9}$"
+                "pattern": "[0-9]{9}"
             },
             # REQUIRED for all user types
             "role": {
@@ -57,7 +57,7 @@ db.create_collection("user", validator={
                 "items": {
                     "bsonType": "string"
                 },
-                "maxItems": 100
+                "maxItems": 10
             },
             # Only used by Vendor
             "location": {
