@@ -1,4 +1,3 @@
-from datetime import datetime
 from pymongo import MongoClient as MangoClient	# will this work?
 import getpass
 
@@ -17,9 +16,11 @@ user = db.get_collection("user")
 menu.insert_one({
     "type": "Breakfast",
     "publishStatus": True,
-    "schedule": [
-        "Monday-Friday: 7:30am - 10:30am"
-    ],
+    "schedule": {
+        "days": "Mon-Fri",
+        "startTime": "07:30",
+        "endTime": "10:30",
+    },
     "location" : "Lower Cafe",
     "menuItem": [
         # Classic Hot Breakfasts
