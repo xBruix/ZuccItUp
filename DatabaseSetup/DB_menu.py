@@ -1465,10 +1465,12 @@ def insert_all_menus(menu):
 			}
 		]
 	})
+	print("Menus inserted")
 # end insert_all_menus
 
+# Prompt user for username and password only if they run this file as a script (not as a module).
 if __name__ == "__main__":
-	from pymongo import MongoClient as MangoClient  # will this work?
+	from pymongo import MongoClient as MangoClient
 	import getpass
 
 	username = input("Enter you Mango username: ")
@@ -1479,9 +1481,8 @@ if __name__ == "__main__":
 	db = client.get_database(f"{username}_project")
 	menu = db.get_collection("menu")  # collection
 
+	# Clear the menu collection so we don't insert duplicates
 	menu.delete_many({})
 
 	insert_all_menus(menu)
-
-	print("Menus inserted")
 	client.close()
