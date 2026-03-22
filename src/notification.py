@@ -1,5 +1,14 @@
+# Authors: Surya Balram
+
+# This file defines the Notification class.
+# It represents a notification that can be sent to users,
+# including its time, description, and heading.
+
 class Notification():
+
     def __init__(self, heading: str, description: str, customer_VIUID: str, order_id: str = ""):
+
+
         
         self.time = datetime.now()
         self.description =description
@@ -7,6 +16,8 @@ class Notification():
         self.customer_VIUID = str(customer_VIUID)                       #added this for tracking whice one is which
         self.order_id = str(order_id) if order_id else ""               #same with this
 
+    # Sends the notification to the intended recipient(s)
+    # This method should handle the logic for delivering notifications
     def sendNotification(self):
        
        notification_doc = {
@@ -22,6 +33,8 @@ class Notification():
        print(f"Notification sent to customer{self.customer_VIUDIF}")    #notification send
        return result.inserted_id                                        #who it was sent to
 
+    # Returns or displays the details of the notification
+    # This can be used to view notification content
     def viewNotification(self):
         
         notifications = list(

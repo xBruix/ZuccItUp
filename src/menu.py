@@ -1,14 +1,14 @@
-from collections import defaultdict
-from DB_init import db
-
 
 class Menu():
+    # Constructor for Menu
+    # Initializes menu type, schedule, and publish status
     def __init__(self, type: str, schedule: list, publishStatus: bool):
 
         self.type = type
         self.schedule = schedule
         self.publishStatus = publishStatus
 
+    # Returns or displays details of a specific menu
     def viewMenu(self):
         keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes and accidental spaces
  
@@ -49,6 +49,7 @@ class Menu():
   
         
 
+    # Returns or displays all available menus
     def viewAllMenus(self):
         menus = list(db.menu.find())
         if not menus: 
@@ -85,7 +86,11 @@ class Menu():
                         f"{item.get('description', '')}"
                     )
 
+# MenuItem represents a single food item in a menu
+# Includes details such as name, price, description, stock status, and allergens
 class MenuItem():
+    # Constructor for MenuItem
+    # Initializes item details including name, price, and availability
     def __init__(self, name: str, price: float, description: str, inStock: bool, allergens: str):
 
         self.name = name
@@ -134,6 +139,7 @@ class MenuItem():
         print("─" * 50)                                      #divider line
         return item                                          #returns the item required
 
+    # Returns or displays all menu items
     def viewAllItems(self):
         items = list(db.menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
             {"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
