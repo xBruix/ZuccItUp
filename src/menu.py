@@ -1,3 +1,8 @@
+# Authors: Surya Balram, Bruce Fernandes
+
+
+from collections import defaultdict
+from DB_init import db
 
 class Menu():
     # Constructor for Menu
@@ -85,6 +90,7 @@ class Menu():
                         f"{stock:<10}  "
                         f"{item.get('description', '')}"
                     )
+
 
 # MenuItem represents a single food item in a menu
 # Includes details such as name, price, description, stock status, and allergens

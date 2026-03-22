@@ -1,4 +1,4 @@
-# Authors: Surya Balram
+# Authors: Surya Balram, Bruce Fernandes
 
 # This file defines the Notification class.
 # It represents a notification that can be sent to users,
@@ -61,7 +61,6 @@ class Notification():
                 print(f"  Order ID: {n.get('orderId')}")
             print("  " + "─" * 50)                                      #last divider
  
-            # Mark the notification as read now that the customer has seen it
             db.notification.update_one(
                 {"_id": n["_id"]},
                 {"$set": {"read": True}}
