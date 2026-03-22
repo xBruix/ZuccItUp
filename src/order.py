@@ -1,4 +1,4 @@
-# Authors: Caleb Bronn
+# Authors: Caleb Bronn, Bruce also did the cart functions and is going to do the later order functions
 
 from typing import Type	# supports using a class as an argument for a function
 from enum import Enum	# for enumerations
@@ -18,8 +18,9 @@ class Cart:
 		#   ...
 		# }
 		self.__cart_items = {}
-
-	# Getters
+#──────────────────────────────────────────────
+# Getters
+#──────────────────────────────────────────────
 	def get_location(self) -> tuple:
 		# Tuple data type in Python is an ordered, unchangeable array of data
 		# See: https://www.w3schools.com/python/python_tuples.asp
@@ -34,65 +35,161 @@ class Cart:
 	# Setters
 	def set_location(self, building: str, room: str):
 		pass
-
-	# Other functions
+#──────────────────────────────────────────────
+# Other functions
+#──────────────────────────────────────────────
 	def add_to_cart(self, menu_item: str, quantity: int):
-		pass
+
+		if quantity <= 0:
+			print("Quantity must be greater than 0.")	#avoiding troll inputs
+			return
+
+		result = list(db.menu.aggregate([				#checks for availability and existence of the item. using $match combines the check
+			{"$unwind": "$menuItem"},					#unwinding the array of menuItem to separate menus
+			{"$match": {
+				"menuItem.name": {"$regex": f"^{menu_item}$", "$options": "i"},
+				"menuItem.inStock": True
+			}},
+			{"$project": {"name": "$menuItem.name"}},
+			{"$limit": 1}
+		]))
+
+		if not result:
+			print(f"'{menu_item}' is out of stock.")	#if it is not available it gives this message
+			return
+
+		canonical_name = result[0]["name"]				#the true name as given in the database(Chicken Strips and not chicken sTRIps)
+
+		if canonical_name in self.__cart_items:			#this checks if the item is already in the cart, if so it just adds to the quantity of the item
+			self.__cart_items[canonical_name] += quantity
+
+		else:
+			self.__cart_items[canonical_name] = quantity
+		print(f"Added {quantity}x '{canonical_name}' to cart.")
 
 	def change_quantity(self, menu_item: str, quantity: int):
-		pass
+     
+		if menu_item not in self.__cart_items:			#cannot change the quantity if it isn't in the cart
+			print(f"'{menu_item}' is not in the cart.")
+			return
+
+		if quantity <= 0:								#if the new quantity is 0 or negative, assume it is calling for removal
+			self.remove_from_cart(menu_item)
+
+		else:
+			self.__cart_items[menu_item] = quantity		#updating the quantity to the new quantity given, if it is meant to be incremental or decremental please change this
+			print(f"Updated '{menu_item}' quantity to {quantity}.")
 
 	def remove_from_cart(self, menu_item: str):
-		pass
+     
+		if menu_item in self.__cart_items:
+			del self.__cart_items[menu_item]
+			print(f"Removed '{menu_item}' from cart.")	#simply removing the item chosen
+   
+		else:
+			print(f"'{menu_item}' is not in the cart.")	#if they try to break the program by removing something that is not there, this checks for that
 
 	def calculate_subtotal(self) -> float:
-		pass
+		total = 0.0
+  
+		for item_name, qty in self.__cart_items.items():#looping through every item in the cart, giving item name and quantity
+			result = list(db.menu.aggregate([			
+            {"$unwind": "$menuItem"},
+            {"$match": {"menuItem.name": {"$regex": f"^{item_name}$", "$options": "i"}}},
+            {"$project": {"price": "$menuItem.price"}},
+            {"$limit": 1}								#for each item we check price
+        ]))
+   
+			if result:									#adding price accounting for the quantity
+				total += result[0]["price"] * qty	
+			
+			else:										#sanity check if price is not in the menu
+				print(f"Warning: price for '{item_name}' not found in menu.")
+            
+		self.__subtotal = round(total, 2)
+		return self.__subtotal							#rounding the total and returning it so its a dollar amount $42.069 as a total does not make sense
 
 	def view_cart(self) -> dict:
-		pass
+
+		if not self.__cart_items:
+			print("Your cart is empty.")				#calling this with an empty cart is dumb
+			return {}
+
+		print(f"\n{'Item':<25} {'Qty':>5}")				#printing column with spacing and divider
+		print("─" * 35)
+
+		for item, qty in self.__cart_items.items():		#looping through to print each item and quantity aligned with the column made above
+			print(f"{item:<25} {qty:>5}")
+   
+		print("─" * 35)									#closing divider line
+		print(f"Delivery to: Building {self.__building}, Room {self.__room}")
+		return self.__cart_items						#prints delivery location and returns the dictionary
 
 	def num_items(self) -> int:
-		return len(self.__cart_items)
+		return len(self.__cart_items)					#!!!!!!!!!!!!!!!!Bruce did not write this, please comment this!!!!!!!!!!!!!
 
 	def convert_to_orders(self):
-		pass
+
+		if not self.__cart_items:
+			print("Cannot place an empty order.")		#again, calling this with an empty cart means you need to seek psyciatric help(i cannot spell)
+			return None
+
+		subtotal = self.calculate_subtotal()			#calling the subtotal function to display the subtotal as required
+
+		order = Order(									#creating the order(i might be missing something here)
+			building=self.__building,
+			room=self.__room,
+			total=subtotal,
+			customer=customer,
+			vendor=vendor,
+		)
+  
+		self.__cart_items = {}							#clearing the cart for the next order after making it into an order
+		self.__subtotal = 0.0
+		return order									#returning the order does not mean the order is placed, place_order() should be called i think
+		
+
+
+#──────────────────────────────────────────────
 # End of Cart
+#──────────────────────────────────────────────
 
-
+#──────────────────────────────────────────────
 # Short enum class for order times:
+#──────────────────────────────────────────────
 class Time(Enum):
-	PLACED = "PLACED"
+	ORDER = "ORDER"
 	READY = "READY"
 	ACCEPT = "ACCEPT"
 	PICKUP = "PICKUP"
 	DELIVERY = "DELIVERY"
 	CONFIRMATION = "CONFIRMATION"
+#──────────────────────────────────────────────
 # End of Time class
+#──────────────────────────────────────────────
 
 
+#──────────────────────────────────────────────
 # Short enum class for order status:
+#──────────────────────────────────────────────
 class Status(Enum):
 	# Not quite sure how to do this, but here's some ideas:
-	# WAITING = "WAITING"	# waiting for agent to accept the order
+	# PENDING = "PENDING"	# waiting for agent to accept the order
 	# READY_FOR_PICKUP = "READY_FOR_PICKUP"
 	# IN_TRANSIT = "IN_TRANSIT"
 	# DELIVERED = "DELIVERED"
 	# RECEIVED = "RECEIVED"
 	pass
+#──────────────────────────────────────────────
 # End of Status class
+#──────────────────────────────────────────────
 
 
 class Order:
-	def __init__(self, building: str,
-				 room: str,
-				 total: float,
-				 instructions: str,
-				 customer: str,
-				 vendor: str
-				 ):
+	def __init__(self, building: str, room: str, total: float, instructions: str, customer: str, vendor: str):
 		self.__building = building
 		self.__room = room
-		self.__total = total
+		self.__subtotal = total
 		self.__special_instructions = instructions
 		self.__customer = customer
 		self.__vendor = vendor
@@ -105,13 +202,14 @@ class Order:
 		self.__pickup_time = ""
 		self.__delivery_time = ""
 		self.__confirmation_time = ""
-
-	# Getters
+#──────────────────────────────────────────────
+# Getters
+#──────────────────────────────────────────────
 	def get_location(self) -> tuple:
 		return self.__building, self.__room
 
-	def get_total(self) -> float:
-		return self.__total
+	def get_subtotal(self) -> float:
+		return self.__subtotal
 
 	def get_instructions(self) -> str:
 		return self.__special_instructions
@@ -134,27 +232,175 @@ class Order:
 			return self.__confirmation_time
 		else:
 			raise ValueError("Unknown time ENUM")
-
-	# Setters
+#──────────────────────────────────────────────
+# Setters
+#──────────────────────────────────────────────
 	def set_instructions(self, instructions: str):
 		self.__special_instructions = instructions
 
-	# Other functions
-	def update_status(self, status: Type[Status]):
-		pass
+#──────────────────────────────────────────────
+# Other functions
+#──────────────────────────────────────────────
+	def update_status(self, status: Type[Status]):		#with this we assume status is the status we want to change the order to
+		self.__order_status = status.value				#extracting the string
+		now = datetime.now()							#capturing the current date and time for later use
+
+		update_fields = {"orderStatus": self.__order_status} #starting the dictionary of fields to write to the db
+
+		if status == Status.READY_FOR_PICKUP:
+			self.__ready_time = now	
+			update_fields["readyTime"] = now			#status transition for ready to pickup
+
+		elif status == Status.IN_TRANSIT:
+			self.__pickup_time = now
+			update_fields["pickupTime"] = now			#status transition for in transit
+
+		elif status == Status.DELIVERED:
+			self.__delivery_time = now
+			update_fields["deliveryTime"] = now			#status transition for delivered
+
+		elif status == Status.RECEIVED:
+			self.__confirmation_time = now
+			update_fields["acceptTime"] = now			#might omit, transition to received
+
+		if self.__order_id:
+			db.order.update_one(
+				{"_id": self.__order_id},
+				{"$set": update_fields}					#first we check if the order exists(it should but checks are good) then we update the fields of the order using the id to find it
+			)
+
+		print(f"Order status updated to: {status.value}") #prints the change to the user, will omit this later since the user does not actually need this unless they ask for it
 
 	def place_order(self) -> bool:
-		pass
+     
+		if not cart_items:
+			print("Cannot place an order with no items.")
+			return False								#sanity check for morons that want to order "nothing"
+
+		self.__placed_time = datetime.now()				#recording order time
+
+		sanitized_items = [
+			{"name": item["name"], "qty": int(item["qty"])}
+			for item in cart_items						#List to rebuild each cart item, casting quantity as int because when i googled, mangodb messes with floats and stuff
+		]
+
+		order_doc = {
+			"building": self.__building,
+			"room": self.__room,
+			"subTotal": float(self.__subtotal),
+			"specialInstructions": self.__special_instructions,
+			"orderStatus": self.__order_status,
+			"orderTime": self.__placed_time,
+			"readyTime": None,
+			"acceptTime": None,
+			"pickupTime": None,
+			"deliveryTime": None,
+			"agent": self.__agent,
+			"customer": self.__customer,
+			"vendor": self.__vendor,
+			"cartItem": sanitized_items,				#i migh've missed something please double check!!!!!!
+		}												#assembling the full doc to insert
+
+		result = db.order.insert_one(order_doc)			#insering the document into the collection. mango should respond with an object containing the new document's ID
+		self.__order_id = result.inserted_id			#saving the ID onto the object which all the order methods will use to find the particular order
+  
+		print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
+		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
+		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
+  
+		return True										#returns success to the caller
 
 	def accept_order(self, agent: str):
-		pass
+     
+		if not self.__order_id:
+			print("Order has not been placed yet.")
+			return										#how is man going to acccept an order that isn't placed(just a check so things don't break)
+
+		self.__agent = agent							#assigning agent
+		self.__accept_time = datetime.now()				#marking the time the order is accepted
+		self.__order_status = Status.IN_TRANSIT.value	#changing order status for obvious reasons
+
+		db.order.update_one(
+			{"_id": self.__order_id},
+			{"$set": {
+				"agent": agent,
+				"orderStatus": self.__order_status,
+				"acceptTime": self.__accept_time,		#writing the agent, orderStatus and acceptTime to the db
+			}}
+		)
+		print(f"Order accepted by agent '{agent}'.")	#saying who actually accepted the order
 
 	def mark_complete(self):
-		pass
+     
+		if not self.__order_id:
+			print("Order has not been placed yet.")
+			return										#yet another check for the system not to break completely
+
+		self.__delivery_time = datetime.now()			#marking delivery time
+		self.__order_status = Status.RECEIVED.value		#updaing the orderStatus
+
+		db.order.update_one(
+			{"_id": self.__order_id},
+			{"$set": {
+				"orderStatus": self.__order_status,
+				"deliveryTime": self.__delivery_time,	#actually writing the changes to the db
+			}}
+		)
+  
+		print("Order marked as complete.")				#messaging that the order is complete
 
 	def view_order(self) -> dict:
-		pass
+		order_dict = {
+			"order_id": str(self.__order_id) if self.__order_id else None,
+			"customer": self.__customer,
+			"vendor": self.__vendor,
+			"agent": self.__agent,
+			"building": self.__building,
+			"room": self.__room,
+			"subtotal": self.__subtotal,
+			"status": self.__order_status,
+			"special_instructions": self.__special_instructions,
+			"placed_time": self.__placed_time,
+			"accept_time": self.__accept_time,
+			"ready_time": self.__ready_time,
+			"pickup_time": self.__pickup_time,
+			"delivery_time": self.__delivery_time,
+			"confirmation_time": self.__confirmation_time,
+		}												#i hate my life, i think this is the entire thing(building the dictionary)
+
+		print("\n" + "─" * 50)							#divider
+		print(f"  Order ID:      {self.__order_id or 'Not placed yet'}")			#orderID or message of unplaced order
+		print(f"  Customer:      {self.__customer}")								#who be the customer
+		print(f"  Vendor:        {self.__vendor}")									#who be the vendor
+		print(f"  Agent:         {self.__agent or 'Unassigned'}")					#who be the agent, hUHHHHHH nobody?!?!?!
+		print(f"  Location:      Building {self.__building}, Room {self.__room}")	#location be this
+		print(f"  Subtotal:      ${self.__subtotal:.2f}")							#taxes may or may not be included
+		print(f"  Status:        {self.__order_status}")							#THIS BE THE STATUS
+		if self.__special_instructions:
+			print(f"  Instructions:  {self.__special_instructions}")				#maybe it's special, maybe it's not
+		if self.__placed_time:
+			print(f"  Placed at:     {self.__placed_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
+		print("─" * 50)									#divider
+		return order_dict								#i have lost my mind
 
 	def view_all_orders(self) -> list[dict]:
-		pass
+		orders = list(db.order.find())
+		if not orders:
+			print("No orders found.")
+			return []									#this is cwaaaaazy, no orders at all?????????
+
+		print(f"\n{'Customer':<15} {'Vendor':<15} {'Status':<18} {'Subtotal':>10}  Location")
+		print("─" * 80)									#table spacing and divider
+		for o in orders:
+			loc = f"Bldg {o.get('building')}, Rm {o.get('room')}"	#this is my way of fixing if the string ever gets too long
+			print(
+				f"{o.get('customer', ''):<15} "
+				f"{o.get('vendor', ''):<15} "
+				f"{o.get('orderStatus', ''):<18} "
+				f"${o.get('subTotal', 0.0):>9.2f}  "	#this one has the 0.0 so if the subtotal is missing, it does not break and print junk values
+				f"{loc}"
+			)
+		return orders									#we made it to the end yay
+#──────────────────────────────────────────────
 # End of Order
+#──────────────────────────────────────────────
