@@ -1,4 +1,4 @@
-# Authors: Surya Balram
+# Authors: Surya Balram, Bruce Fernandes
 
 # This file defines all user-related classes for the system.
 # It includes a base User class and specialized subclasses:
