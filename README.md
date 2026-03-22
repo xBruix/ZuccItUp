@@ -1,7 +1,7 @@
 # Zucc It Up
 The Kirby Space Program's project for CSCI 375. Zucc It Up is a food delivery system for the VIU campus.
 
-## Setting up a python virtual environment
+## Setting Up The Python Virtual Environment
 
 The program must be run from inside a [Python virtual environment](https://www.w3schools.com/python/python_virtualenv.asp).
 
@@ -19,13 +19,11 @@ If these are already installed, navigate to the project directory ZuccItUp/, the
 
 `source ./venv/bin/activate`
 
-After this, you should be able to see that you are working in the virtual environment because your command line will something like this:
+After this, you should be able to see that you are working in the virtual environment because your command line will look something like this:
 
 ```
 (venv) ...$
 ```
-
-You can also run `ls` to list everything in your current directory, and you should see a directory called "venv".
 
 #### 3. Install All Required Packages
 
@@ -33,6 +31,19 @@ You can also run `ls` to list everything in your current directory, and you shou
 
 You are now able to run _pymongo_! I mean _pymango_!
 
-#### 4. Apply schema validation
-Run DB_validation.py to apply a schema validation to the database. 
+### Important Reminder:
+
+To run any Python file, you must run it from inside the virtual environment. Steps 1 and 3 are only necessary to _set up_ the environment, so they only need to be run once and never again. However, you will need to follow [step 2](#2-activate-the-environment) each time before you attempt to run a Python file.
+
+## Setting Up The Database
+
+1. Navigate to the DatabaseSetup directory with `cd DatabaseSetup/`.
+
+2. Run `python3 DB_validation.py` to apply a schema validation to the three collections in the database (user, menu, and order). 
+
+3. For step 3, you have two options: initialize all the collections, or initialize only one collection at a time.
+   1. **To initialize all the collections at once**, run `python3 DB_init.py` and follow the prompts to enter your MangoDB username and password.
+   2. **Initialize only one collection at a time**, run `python3 DB_<collection>.py`, where _\<collection\>_ is the name of one of the three collections (user, menu, or order).
+
+The database is now filled with data!
 

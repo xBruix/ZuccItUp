@@ -9,7 +9,7 @@ class Menu():
         self.schedule = schedule
         self.publishStatus = publishStatus
 
-    def __viewMenu(self):
+    def viewMenu(self):
         keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes and accidental spaces
  
         pipeline = [                         #building our mongodb pipeline
@@ -49,7 +49,7 @@ class Menu():
   
         
 
-    def __viewAllMenus(self):
+    def viewAllMenus(self):
         menus = list(db.menu.find())
         if not menus: 
             print("No menus are currently available.") #if there is no menus present, prints this message
@@ -94,13 +94,13 @@ class MenuItem():
         self.inStock = inStock
         self.allergens = allergens
 
-    def __addToCart(self,cart):
+    def addToCart(self,cart):
         if not self.inStock: 
             print(f"Sorry, '{self.name}' is currently out of stock.") #no stock means no add cart
             return
         cart.add_to_cart(self.name, 1)                       #add cart if in stock
 
-    def __viewItem(self): 
+    def viewItem(self): 
         result = list(db.menu.aggregate([                    #runs aggregation pipeline against menu collection and converts it into a list
             {"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
             {"$match": {"menuItem.name": {"$regex": f"^{self.name}$", "$options": "i"}}}, #filters to where only the matching item remains
@@ -134,7 +134,7 @@ class MenuItem():
         print("─" * 50)                                      #divider line
         return item                                          #returns the item required
 
-    def __viewAllItems(self):
+    def viewAllItems(self):
         items = list(db.menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
             {"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
             {"$project": {                                   #selects the fields we want to output

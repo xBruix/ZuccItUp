@@ -241,47 +241,47 @@ class Order:
 #──────────────────────────────────────────────
 # Other functions
 #──────────────────────────────────────────────
-	def update_status(self, status: Type[Status]):
-		self.__order_status = status.value
-		now = datetime.now()
+	def update_status(self, status: Type[Status]):		#with this we assume status is the status we want to change the order to
+		self.__order_status = status.value				#extracting the string
+		now = datetime.now()							#capturing the current date and time for later use
 
-		update_fields = {"orderStatus": self.__order_status}
+		update_fields = {"orderStatus": self.__order_status} #starting the dictionary of fields to write to the db
 
 		if status == Status.READY_FOR_PICKUP:
-			self.__ready_time = now
-			update_fields["readyTime"] = now
+			self.__ready_time = now	
+			update_fields["readyTime"] = now			#status transition for ready to pickup
 
 		elif status == Status.IN_TRANSIT:
 			self.__pickup_time = now
-			update_fields["pickupTime"] = now
+			update_fields["pickupTime"] = now			#status transition for in transit
 
 		elif status == Status.DELIVERED:
 			self.__delivery_time = now
-			update_fields["deliveryTime"] = now
+			update_fields["deliveryTime"] = now			#status transition for delivered
 
 		elif status == Status.RECEIVED:
 			self.__confirmation_time = now
-			update_fields["acceptTime"] = now
+			update_fields["acceptTime"] = now			#might omit, transition to received
 
 		if self.__order_id:
 			db.order.update_one(
 				{"_id": self.__order_id},
-				{"$set": update_fields}
+				{"$set": update_fields}					#first we check if the order exists(it should but checks are good) then we update the fields of the order using the id to find it
 			)
 
-		print(f"Order status updated to: {status.value}")
+		print(f"Order status updated to: {status.value}") #prints the change to the user, will omit this later since the user does not actually need this unless they ask for it
 
 	def place_order(self) -> bool:
      
 		if not cart_items:
 			print("Cannot place an order with no items.")
-			return False
+			return False								#sanity check for morons that want to order "nothing"
 
-		self.__placed_time = datetime.now()
+		self.__placed_time = datetime.now()				#recording order time
 
 		sanitized_items = [
 			{"name": item["name"], "qty": int(item["qty"])}
-			for item in cart_items
+			for item in cart_items						#List to rebuild each cart item, casting quantity as int because when i googled, mangodb messes with floats and stuff
 		]
 
 		order_doc = {
@@ -298,60 +298,109 @@ class Order:
 			"agent": self.__agent,
 			"customer": self.__customer,
 			"vendor": self.__vendor,
-			"cartItem": sanitized_items,
-		}
+			"cartItem": sanitized_items,				#i migh've missed something please double check!!!!!!
+		}												#assembling the full doc to insert
 
-		result = db.order.insert_one(order_doc)
-		self.__order_id = result.inserted_id
+		result = db.order.insert_one(order_doc)			#insering the document into the collection. mango should respond with an object containing the new document's ID
+		self.__order_id = result.inserted_id			#saving the ID onto the object which all the order methods will use to find the particular order
+  
 		print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
 		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
-		print(f"Subtotal: ${self.__subtotal:.2f}")
-		return True
+		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
+  
+		return True										#returns success to the caller
 
 	def accept_order(self, agent: str):
      
 		if not self.__order_id:
 			print("Order has not been placed yet.")
-			return
+			return										#how is man going to acccept an order that isn't placed(just a check so things don't break)
 
-		self.__agent = agent
-		self.__accept_time = datetime.now()
-		self.__order_status = Status.IN_TRANSIT.value
+		self.__agent = agent							#assigning agent
+		self.__accept_time = datetime.now()				#marking the time the order is accepted
+		self.__order_status = Status.IN_TRANSIT.value	#changing order status for obvious reasons
 
 		db.order.update_one(
 			{"_id": self.__order_id},
 			{"$set": {
 				"agent": agent,
 				"orderStatus": self.__order_status,
-				"acceptTime": self.__accept_time,
+				"acceptTime": self.__accept_time,		#writing the agent, orderStatus and acceptTime to the db
 			}}
 		)
-		print(f"Order accepted by agent '{agent}'.")
+		print(f"Order accepted by agent '{agent}'.")	#saying who actually accepted the order
 
 	def mark_complete(self):
-		pass
+     
+		if not self.__order_id:
+			print("Order has not been placed yet.")
+			return										#yet another check for the system not to break completely
+
+		self.__delivery_time = datetime.now()			#marking delivery time
+		self.__order_status = Status.RECEIVED.value		#updaing the orderStatus
+
+		db.order.update_one(
+			{"_id": self.__order_id},
+			{"$set": {
+				"orderStatus": self.__order_status,
+				"deliveryTime": self.__delivery_time,	#actually writing the changes to the db
+			}}
+		)
+  
+		print("Order marked as complete.")				#messaging that the order is complete
 
 	def view_order(self) -> dict:
-		pass
+		order_dict = {
+			"order_id": str(self.__order_id) if self.__order_id else None,
+			"customer": self.__customer,
+			"vendor": self.__vendor,
+			"agent": self.__agent,
+			"building": self.__building,
+			"room": self.__room,
+			"subtotal": self.__subtotal,
+			"status": self.__order_status,
+			"special_instructions": self.__special_instructions,
+			"placed_time": self.__placed_time,
+			"accept_time": self.__accept_time,
+			"ready_time": self.__ready_time,
+			"pickup_time": self.__pickup_time,
+			"delivery_time": self.__delivery_time,
+			"confirmation_time": self.__confirmation_time,
+		}												#i hate my life, i think this is the entire thing(building the dictionary)
+
+		print("\n" + "─" * 50)							#divider
+		print(f"  Order ID:      {self.__order_id or 'Not placed yet'}")			#orderID or message of unplaced order
+		print(f"  Customer:      {self.__customer}")								#who be the customer
+		print(f"  Vendor:        {self.__vendor}")									#who be the vendor
+		print(f"  Agent:         {self.__agent or 'Unassigned'}")					#who be the agent, hUHHHHHH nobody?!?!?!
+		print(f"  Location:      Building {self.__building}, Room {self.__room}")	#location be this
+		print(f"  Subtotal:      ${self.__subtotal:.2f}")							#taxes may or may not be included
+		print(f"  Status:        {self.__order_status}")							#THIS BE THE STATUS
+		if self.__special_instructions:
+			print(f"  Instructions:  {self.__special_instructions}")				#maybe it's special, maybe it's not
+		if self.__placed_time:
+			print(f"  Placed at:     {self.__placed_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
+		print("─" * 50)									#divider
+		return order_dict								#i have lost my mind
 
 	def view_all_orders(self) -> list[dict]:
 		orders = list(db.order.find())
 		if not orders:
 			print("No orders found.")
-			return []
+			return []									#this is cwaaaaazy, no orders at all?????????
 
 		print(f"\n{'Customer':<15} {'Vendor':<15} {'Status':<18} {'Subtotal':>10}  Location")
-		print("─" * 80)
+		print("─" * 80)									#table spacing and divider
 		for o in orders:
-			loc = f"Bldg {o.get('building')}, Rm {o.get('room')}"
+			loc = f"Bldg {o.get('building')}, Rm {o.get('room')}"	#this is my way of fixing if the string ever gets too long
 			print(
 				f"{o.get('customer', ''):<15} "
 				f"{o.get('vendor', ''):<15} "
 				f"{o.get('orderStatus', ''):<18} "
-				f"${o.get('subTotal', 0.0):>9.2f}  "
+				f"${o.get('subTotal', 0.0):>9.2f}  "	#this one has the 0.0 so if the subtotal is missing, it does not break and print junk values
 				f"{loc}"
 			)
-		return orders
+		return orders									#we made it to the end yay
 #──────────────────────────────────────────────
 # End of Order
 #──────────────────────────────────────────────

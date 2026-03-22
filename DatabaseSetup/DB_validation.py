@@ -182,7 +182,7 @@ db.create_collection("order", validator={
 
             "orderStatus": {
                 "bsonType": "string",
-                "enum": ["pending", "readyForPickup", "inTransit", "delivered", "received"]
+                "enum": ["Pending", "ReadyForPickup", "InTransit", "Delivered", "Received"]
             },
 
             "orderTime": {
