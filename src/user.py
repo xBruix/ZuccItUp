@@ -48,6 +48,7 @@ class DeliveryAgent(User):
     # Returns details of a specific delivery agent
     def viewAgent(self):
         agent = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})        #search for the VIUID since that is the unique marker
+        
         if not agent:
             print(f"No agent found with VIUID {self.VIUID}.")
             return None                                                         #if the ID does not belong to an agent then tough luck
