@@ -148,7 +148,7 @@ def get_menu_item(menuItemID=None):
     return result
 
 #order functions
-
+# for order identification we are using the given _id from mongodb
 def create_order(building, room, subtotal, instructions, customer, vendor, cart):
     order_doc = {
         "building": building,
