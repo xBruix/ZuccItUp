@@ -5,7 +5,16 @@ def verify_user(viu_ID):
 
     is_valid = false
 
+    result = user.find_one({
+        "VIUID": viu_ID
+    })
+
+    if result:
+        is_valid = true
+        return is_valid
+    
     return is_valid
+    
 
 def create_user(email,name,viu_ID,role):
 
@@ -17,7 +26,11 @@ def deactivate_user(viu_ID):
 
 def view_user(viu_ID):
 
-    return
+    result = user.find_one({
+        "VIUID": viu_ID
+    })
+
+    return result
 
 
 #menu functions 
