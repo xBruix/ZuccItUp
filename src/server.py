@@ -14,10 +14,7 @@ class Server:
 		self.__project = user_ID + "_project"
 
 		# URI of the MangoDB server
-		self.__uri = (f"mongodb://{user_ID}:{passwd}"
-					  f"@studb-mongo.csci.viu.ca:27017/"
-					  f"{self.__project}?authSource=admin"
-					  )
+		self.__uri = f"mongodb://{user_ID}:{passwd}@studb-mongo.csci.viu.ca:27017/{self.__project}?authSource=admin"
 
 		# Create DB Client or throw an exception if the user ID or password is incorrect.
 		try:
@@ -25,7 +22,7 @@ class Server:
 			self.__db = self.__client.get_database(self.__project)
 			# Ping the database to check that username and password are actually correct
 			self.__db.command("ping")
-		except Exception as e:
+		except Exception:
 			# Username and/or password were NOT correct
 			raise ValueError("Could not connect to MongoDB: username or password was incorrect")
 		else:
