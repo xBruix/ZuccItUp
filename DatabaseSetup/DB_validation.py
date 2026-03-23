@@ -24,7 +24,7 @@ except:
 db.create_collection("user", validator={ 
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["name", "email", "VIUID", "role"],
+        "required": ["name", "email", "VIUID", "role", "active"],
         "properties": {
             # REQUIRED for all user types
             "name": {

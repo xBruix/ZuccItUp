@@ -1,4 +1,4 @@
-# Authors: Caleb Bronn, Bruce also did the cart functions and is going to do the later order functions
+# Authors: Caleb Bronn, Bruce Fernandes
 
 from typing import Type	# supports using a class as an argument for a function
 from enum import Enum	# for enumerations

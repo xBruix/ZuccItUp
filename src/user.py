@@ -1,22 +1,34 @@
+# Authors: Surya Balram, Bruce Fernandes
+
+# This file defines all user-related classes for the system.
+# It includes a base User class and specialized subclasses:
+# DeliveryAgent, Customer, and Vendor.
 import server
 
 class User:
+    # Constructor for the base User class
+    # Initializes common attributes shared by all users
     def __init__(self, name: str, email: str, role: str):
 
         self.name = name
         self.email = email
         self.role = role
 
+
 #──────────────────────────────────────────────
 # Agent
 #──────────────────────────────────────────────
+
 class DeliveryAgent(User):
+    # Constructor for DeliveryAgent
+    # Adds VIU ID and availability status to base User attributes
     def __init__(self, availibilityStatus: bool, VIUID: int, name: str, email: str, role: str):
 
         User.__init__(self, name, email, role)
         self.VIUID = VIUID
         self.availibilityStatus = availibilityStatus
 
+    # Creates a new delivery agent in the system
     def createAgent(self):
         existing = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})     #finding if the db already has an agent with the given VIUID
         if existing:
@@ -37,6 +49,7 @@ class DeliveryAgent(User):
         print(f"Agent '{self.name}' created successfully.")
         return result.inserted_id                                               #now we print the ID as is in the db
 
+    # Returns details of a specific delivery agent
     def viewAgent(self):
         agent = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})        #search for the VIUID since that is the unique marker
         if not agent:
@@ -53,6 +66,7 @@ class DeliveryAgent(User):
         print("─" * 40)                                                         #divider
         return agent                                                            #returns the agent as is
         
+    # Returns a list of all delivery agents
     def viewAllAgents(self):
         agents = list(view_all_user(agent))      #kw                    #we want a list of the agents
         if not agents:                                                          #NO AGENTS?!?!?!!?
@@ -72,7 +86,9 @@ class DeliveryAgent(User):
             )
         return agents                                                           #returning the list of agents
 
+    # Verifies the VIU ID of the delivery agent
     def verifyVIUID(self):
+
         
         result = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})       #lets find the agent to see if they exist
         
@@ -93,13 +109,22 @@ class DeliveryAgent(User):
 #──────────────────────────────────────────────
 # Customer
 #────────────────────────────────────────────── 
+
+
+
+# Customer class inherits from User
+# Represents a customer who can place orders
+
 class Customer(User):
 
+    # Constructor for Customer
+    # Adds VIU ID and tracks previous orders
     def __init__(self, VIUID: int, name: str, email: str, role: str):
         User.__init__(self, name, email, role)
         self.VIUID = VIUID
         self.previouslyOrdered
 
+    # Creates a new customer in the system
     def createCustomer(self):
 
         if verify_user(self.VIUID):
@@ -122,6 +147,7 @@ class Customer(User):
         print(f"Customer '{self.name}' created successfully.")                  #done yay
         return result.inserted_id                                               #returning the ID as inserted into mangoDB
 
+    # Returns details of a specific customer
     def viewCustomer(self):
         customer = view_user(self.VIUID)
         if not customer:
@@ -141,6 +167,7 @@ class Customer(User):
         
         return customer                                                         #returning the customer to the caller
 
+    # Returns a list of all customers
     def viewAllCustomers(self):
         
         customers = list(view_all_user("customer"))     #kw               #pulling the list of customers from Mango
@@ -161,7 +188,9 @@ class Customer(User):
         
         return customers                                                        #returning the list of customers
 
+    # Verifies the VIU ID of the customer
     def verifyVIUID(self):
+
         
         result = db.user.find_one({"VIUID": self.VIUID, "role": "Customer"})       #lets find the agent to see if they exist
         
@@ -177,15 +206,23 @@ class Customer(User):
 #──────────────────────────────────────────────
 # vEnDoR
 #──────────────────────────────────────────────
+
+# Vendor class inherits from User
+# Represents a food vendor on campus
+
 class Vendor(User):
 
+    # Constructor for Vendor
+    # Stores vendor location and hours of operation
     def __init__(self, location: str, hoursOfOperations: list, name: str, email: str, role: str):
         User.__init__(self, name, email, role)
         self.location = location
         self.hoursOfOperations = hoursOfOperations
 
+    # Returns details of a specific vendor
     def viewVendor(self):
         pass
 
+    # Returns a list of all vendors
     def viewAllVendors(self):
         pass
