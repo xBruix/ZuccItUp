@@ -24,7 +24,7 @@ except:
 db.create_collection("user", validator={ 
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["name", "email", "VIUID", "role"],
+        "required": ["name", "email", "VIUID", "role", "active"],
         "properties": {
             # REQUIRED for all user types
             "name": {
@@ -47,6 +47,10 @@ db.create_collection("user", validator={
                 "bsonType": "string",
                 "enum": ["Agent", "Customer", "Vendor"]
             },
+			# REQUIRED for all user types
+			"active": {
+				"bsonType": "bool"
+			},
             # Only used by Delivery Agent
             "availabilityStatus": {
                 "bsonType": "bool"

@@ -18,6 +18,7 @@ def insert_all_users(user):
 		"email": "foodservices@viu.ca",
 		"VIUID": "000000001",
 		"role": "Vendor",
+		"active": True,
 		"location": "Building 185 Cafeteria",
 		"hoursOfOperation": {
 			"days": "Mon-Fri",
@@ -31,6 +32,7 @@ def insert_all_users(user):
 		"email": "foodservices@viu.ca",
 		"VIUID": "000000002",
 		"role": "Vendor",
+		"active": True,
 		"location": "Building 300 Cafeteria",
 		"hoursOfOperation": {
 			"days": "Mon-Fri",
@@ -44,6 +46,7 @@ def insert_all_users(user):
 		"email": "unleashedhotdogs@gmail.com",	# made-up email 'cos the hot dog guy doesn't have one (that I can find)
 		"VIUID": "000000003",
 		"role": "Vendor",
+		"active": True,
 		"location": "Royal Bank Plaza",
 		"hoursOfOperation": {
 			"days": "Tue-Thu",
@@ -61,6 +64,7 @@ def insert_all_users(user):
 		"email": "sarah.carruthers@iu.ca",
 		"VIUID": "100000000",
 		"role": "Customer",
+		"active": True,
 		"previouslyOrdered": [],
 	}
 
@@ -69,6 +73,7 @@ def insert_all_users(user):
 		"email": "brick.cuppy@gmail.com",
 		"VIUID": "633377721",
 		"role": "Customer",
+		"active": True,
 		"previouslyOrdered": [],
 	}
 
@@ -77,6 +82,7 @@ def insert_all_users(user):
 		"email": "Paniniwolfe@gmail.com",
 		"VIUID": "666742069",
 		"role": "Customer",
+		"active": True,
 		"previouslyOrdered": [],
 	}
 
@@ -85,6 +91,7 @@ def insert_all_users(user):
         "email": "losermgee@viu.ca",
         "role": "Customer",
         "VIUID": "123456789",
+		"active": True,
         "previouslyOrdered": [
             "Chicken Strips", "Coffee", "Monster", "Hot Dog"
         ]
@@ -95,6 +102,7 @@ def insert_all_users(user):
         "email": "emily.chen@viu.ca",
         "role": "Customer",
         "VIUID": "456789123",
+		"active": True,
         "previouslyOrdered": [
             "Caesar Salad", "Latte", "Blueberry Muffin", "Greek Salad"
         ]
@@ -105,6 +113,7 @@ def insert_all_users(user):
         "email": "mjohnson@gmail.com",
         "role": "Customer",
         "VIUID": "789123456",
+		"active": True,
         "previouslyOrdered": [
             "Pepperoni Pizza", "Coke", "Chicken Wings"
         ]
@@ -115,6 +124,7 @@ def insert_all_users(user):
         "email": "sarah.m@viu.ca",
         "role": "Customer",
         "VIUID": "321654987",
+		"active": True,
         "previouslyOrdered": [
             "Veggie Burger", "Iced Tea", "Fresh Fruit Cup", "Yogurt Parfait"
         ]
@@ -125,6 +135,7 @@ def insert_all_users(user):
 		"email": "david.lee88@gmail.com",
 		"role": "Customer",
 		"VIUID": "987654321",
+		"active": True,
 		"previouslyOrdered": [
 			"BLT", "Coffee", "Chocolate Chip Cookie"
 		]
@@ -135,6 +146,7 @@ def insert_all_users(user):
 		"email": "priya.patel@viu.ca",
 		"role": "Customer",
 		"VIUID": "147258369",
+		"active": True,
 		"previouslyOrdered": [
 			"Falafel Wrap", "Smoothie", "Granola Bar", "Banana Bread"
 		]
@@ -145,6 +157,7 @@ def insert_all_users(user):
 		"email": "athompson@gmail.com",
 		"role": "Customer",
 		"VIUID": "258369147",
+		"active": False,
 		"previouslyOrdered": []  # New Customer, no previous orders
 	}
 	
@@ -153,6 +166,7 @@ def insert_all_users(user):
 		"email": "jwang@viu.ca",
 		"role": "Customer",
 		"VIUID": "369147258",
+		"active": False,
 		"previouslyOrdered": [
 			"Sushi Roll", "Green Tea", "Miso Soup", "Edamame"
 		]
@@ -167,6 +181,7 @@ def insert_all_users(user):
 		"email": "Bruixisawesome@gmail.com",
 		"VIUID": "777888999",
 		"role": "Agent",
+		"active": True,
 		"availabilityStatus": False,
 	}
 
@@ -175,6 +190,7 @@ def insert_all_users(user):
 		"email": "suryasgotgame@hotmail.com",
 		"VIUID": "123123123",
 		"role": "Agent",
+		"active": True,
 		"availabilityStatus": True,
 	}
 
@@ -183,6 +199,7 @@ def insert_all_users(user):
 		"email": "mike.stevens@viu.ca",
 		"role": "Agent",
 		"VIUID": "111222333",
+		"active": True,
 		"availabilityStatus": True,  # Currently available
 		"previouslyOrdered": []
 	}
@@ -191,6 +208,7 @@ def insert_all_users(user):
 		"email": "jlopez.Agent@viu.ca",
 		"role": "Agent",
 		"VIUID": "222333444",
+		"active": True,
 		"availabilityStatus": True,
 		"previouslyOrdered": ["Coffee"]
 	}
@@ -199,6 +217,7 @@ def insert_all_users(user):
 		"email": "rkim.delivery@viu.ca",
 		"role": "Agent",
 		"VIUID": "333444555",
+		"active": True,
 		"availabilityStatus": False,  # Currently not available
 		"previouslyOrdered": []
 	}
@@ -207,6 +226,7 @@ def insert_all_users(user):
 		"email": "awilson.Agent@viu.ca",
 		"role": "Agent",
 		"VIUID": "444555666",
+		"active": True,
 		"availabilityStatus": True,
 		"previouslyOrdered": ["Breakfast Burrito", "Coffee"]
 	}
@@ -215,6 +235,7 @@ def insert_all_users(user):
 		"email": "carlos.r@viu.ca",
 		"role": "Agent",
 		"VIUID": "555666777",
+		"active": True,
 		"availabilityStatus": True,
 		"previouslyOrdered": ["Pizza", "Monster"]
 	}
@@ -223,6 +244,7 @@ def insert_all_users(user):
 		"email": "lzhang.delivery@viu.ca",
 		"role": "Agent",
 		"VIUID": "666777888",
+		"active": False,
 		"availabilityStatus": False,
 		"previouslyOrdered": []
 	}
