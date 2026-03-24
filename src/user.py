@@ -45,7 +45,7 @@ class DeliveryAgent(User):
         result = db.user.insert_one(agent_doc)
                                           """    
         #kw
-        result = create_user(self.email,self.name,self.VIUID,"agent",self.availibilityStatus)                                                                #inserting the agent into the db  
+        result = create_user(self.email,self.name,self.VIUID,"agent",self.availibilityStatus)#inserting the agent into the db  
         print(f"Agent '{self.name}' created successfully.")
         return result.inserted_id                                               #now we print the ID as is in the db
 
@@ -69,7 +69,8 @@ class DeliveryAgent(User):
         
     # Returns a list of all delivery agents
     def viewAllAgents(self):
-        agents = list(view_all_user(agent))      #kw                    #we want a list of the agents
+        agents = list(view_all_user(agent))      #kw                            #we want a list of the agents
+                                                 #view_all_user is not defined and not in camel Case
         if not agents:                                                          #NO AGENTS?!?!?!!?
             print("No delivery agents found.")  
             return []                                                           #returning a list since if we don't it might break the caller of this function

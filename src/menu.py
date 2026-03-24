@@ -16,7 +16,7 @@ class Menu():
 
     #search by menuItem
     def viewMenu(self):
-        keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes and accidental spaces
+        keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes any accidental spaces
  
     
         pipeline = [                         #building our mongodb pipeline
@@ -34,7 +34,8 @@ class Menu():
             "inStock": "$menuItem.inStock",
             "allergens": "$menuItem.allergens",
         }})
- 
+                                                #we got to make this also in server.py!!!!!!!!!
+                                                
         items = list(db.menu.aggregate(pipeline)) #running pipeline against the db and makes a plain python list
         if not items:
             print("No items found.")         #if no menu is found then gives this message
@@ -134,7 +135,8 @@ class MenuItem():
         menuItemID = input("Enter menu item name")
         result = get_menu_item(menuItemID)                  #kw
         result_list = list(result) #why is result_list greyed out
-
+                                    #might have broken when i fixed surya's merge conflicts
+                                    #if this works then we can remove the above database code right?
         if not result:                                       #if the item is not found we exit the list and print the message
             print(f"Item '{self.name}' was not found in any menu.")
             return None
@@ -171,7 +173,7 @@ class MenuItem():
     
         result = get_menu_item() #called with null to get all menu items
         items = list(result)     #kw
- 
+                                    #this works then we can remove the code above? Bruce
         if not items:
             print("No menu items found.")                    #unlikely but if the database is empty, it will print this
             return []
