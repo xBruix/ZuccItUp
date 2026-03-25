@@ -23,8 +23,8 @@ def insert_all_orders(order):
 		"readyTime": datetime(2026, 2, 27, 11, 7, 0),  # 11:07 AM
 		"pickupTime": datetime(2026, 2, 27, 11, 10, 0),  # 11:10 AM
 		"deliveryTime": datetime(2026, 2, 27, 11, 15, 0),  # 11:15 AM
-		"customer": "Kyle",
-		"agent": "Surya Balram",
+		"customer": "123456789",	# Kyle
+		"agent": "123123123",	# Surya
 		"vendor": "Upper Cafeteria",
 		"cartItem": [
 			{
@@ -49,8 +49,8 @@ def insert_all_orders(order):
 		"readyTime": datetime(2026, 3, 19, 12, 10, 0),  # 12:10 AM
 		"pickupTime": datetime(2026, 3, 19, 12, 12, 0), # 12:12 AM
 		"deliveryTime": datetime(2026, 3, 19, 12, 15, 0),  # 12:15 AM
-		"customer": "Kyle",
-		"agent": "Bruce Fernandes",
+		"customer": "123456789",	# Kyle
+		"agent": "777888999",		# Bruce
 		"vendor": "Unleashed Hot Dogs",
 		"cartItem": [
 			{
