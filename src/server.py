@@ -13,19 +13,19 @@ class Server:
 	data types.
 
 	Parameters:
-	:param str user_ID: the user's MongoDB username
+	:param str user_id: the user's MongoDB username
 	:param str passwd: the user's MongoDB password
 	"""
-	def __init__(self, user_ID: str, passwd: str):
+	def __init__(self, user_id: str, passwd: str):
 		# DEBUG
-		# print("Username: " + user_ID)
+		# print("Username: " + user_id)
 		# print("Password: " + passwd)
 
 		# Name of the project you want to connect to, e.g. csci375a_project
-		self.__project = user_ID + "_project"
+		self.__project = user_id + "_project"
 
 		# URI of the MangoDB server
-		self.__uri = f"mongodb://{user_ID}:{passwd}@studb-mongo.csci.viu.ca:27017/{self.__project}?authSource=admin"
+		self.__uri = f"mongodb://{user_id}:{passwd}@studb-mongo.csci.viu.ca:27017/{self.__project}?authSource=admin"
 
 		# Create DB Client or throw an exception if the user ID or password is incorrect.
 		try:
@@ -49,56 +49,52 @@ class Server:
 		"""Severs the connection to the database server"""
 		self.__client.close()
 
-	def verify_user(self, viu_ID: str) -> bool:
+	def verify_user(self, viu_id: str) -> bool:
 		result = self.__user.find_one({
-			"VIUID": viu_ID
+			"VIUID": viu_id
 		})
 		return result is not None
 
-	def create_user(self, email: str, name: str, viu_ID: str, role: str, availability_status: bool=None) -> str:
+	def create_user(self, email: str, name: str, viu_id: str, role: str, availability_status: bool = None):
 		"""
-		Inserts a new user to the user collection.
+		Inserts a new user to the user collection. If the user already exists, it sets their status to active.
 		Parameters:
 		:param email: A valid email address
 		:param name: The user's name
-		:param viu_ID: The user's VIU ID number (9 digits)
+		:param viu_id: The user's VIU ID number (9 digits)
 		:param role: Must be either 'customer' or 'agent'
 		:param availability_status: Optional, true for available, false for unavailable
-		Returns:
-		:return str: the newly-created user's MongoDB ID number
+
 		Exceptions:
-		:raises ValueError: if the user already exists
+		:raises ValueError: If an invalid parameter is given. A parameter is invalid if it doesn't align
+		with the criteria in DB_validation.py
 		"""
-		if self.verify_user(viu_ID):
-			raise ValueError("User already exists")
+		if self.verify_user(viu_id):
+			self.__user.update_one(
+				{"VIUID": viu_id},
+				{"$set": {"active": True}}
+			)
 
-		if role.lower() == "agent":
-			agent_doc = {
-				"name": name,
-				"email": email,
-				"VIUID": viu_ID,
-				"role": role,
-				"active": True,
-				"availabilityStatus": availability_status	# defining the agent to be added to the db with the required details
-			}
-			result = self.__user.insert_one(agent_doc)
-			return str(result.inserted_id)
+		new_user_doc = {
+			"name": name,
+			"email": email,
+			"VIUID": viu_id,
+			"role": role.title(),	# Ensures that the role is capitalized
+			"active": True,
+			"previouslyOrdered": []
+		}
 
-		elif role.lower() == "customer":
-			customer_doc = {
-				"name": name,
-				"email": email,
-				"VIUID": viu_ID,
-				"role": role,
-				"active": True,
-				"previouslyOrdered": []
-			}
-			result = self.__user.insert_one(customer_doc)
-			return str(result.inserted_id)
+		if availability_status is not None:
+			new_user_doc["availabilityStatus"] = availability_status
 
-	def deactivate_user(self, viu_ID: str):
+		try:
+			self.__user.insert_one(new_user_doc)
+		except Exception:
+			raise ValueError("Invalid parameter in create_user. Ensure that parameters follow the criteria given in DB_validation.py")
+
+	def deactivate_user(self, viu_id: str):
 		self.__user.update_one(
-			{"VIUID": viu_ID},
+			{"VIUID": viu_id},
 			{"$set":
 				 {"active": False}
 			}
@@ -108,13 +104,15 @@ class Server:
 		results = self.__user.find({"role": role})
 		return results.to_list()
 
-	def view_user(self, viu_ID: str) -> dict:
-		return self.__user.find_one({"VIUID": viu_ID})
+	def view_user(self, viu_id: str) -> dict:
+		return self.__user.find_one({"VIUID": viu_id})
 
 
 	# Menu functions
 
 	#gets all vendor names
+
+	# NOTE: we don't need get_vendors since you could just call view_all_users("Vendor") to do the same thing
 	def get_vendors(self) -> list[dict]:
 		result = self.__menu.distinct("vendor")
 
@@ -124,14 +122,14 @@ class Server:
 		return result
 
 	# whichever param is filled will change the query,
-	# if vendor_ID=upper cafe it will display upper cafe menus
+	# if vendor_id=upper cafe it will display upper cafe menus
 	# if menuItem = coffee it will find menu with coffee
 	# null of all should return all menus
-	def get_all_menus(self, vendor_ID: str=None, menu_item: str=None, menu_type: str=None) -> list[dict]:
+	def get_all_menus(self, vendor_id: str=None, menu_item: str=None, menu_type: str=None) -> list[dict]:
 		query = {}
 
-		if vendor_ID:
-			query["vendor"] = vendor_ID
+		if vendor_id:
+			query["vendor"] = vendor_id
 
 		if menu_item:
 			query["menuItem"] = menu_item
@@ -144,30 +142,23 @@ class Server:
 
 	#by type and/or by vendor
 	# both params are used it will display the menu with both conditions
-	# works with only one param but will still only display one menu
-	def get_one_menu(self, vendor_ID: str=None, menu_type: str=None) -> dict:
-		query = {}
-
-		if vendor_ID:
-			query["vendor"] = vendor_ID
-
-		if menu_type:
-			query["type"] = menu_type.title()
-
-		result = self.__menu.find_one(query)
-
-		return result
+	def get_one_menu(self, vendor_name: str, menu_type: str) -> dict:
+		query = {
+			"vendor": vendor_name,
+			"type": menu_type.title()
+		}
+		return self.__menu.find_one(query)
 
 	#used by view Item or view all items
 	# with param means display one menu item
 	# with param = null display all menus
-	def get_menu_item(self, menu_item_ID=None) -> dict:
+	def get_menu_item(self, menu_item_id: str = None) -> dict:
 
-		if menu_item_ID:
+		if menu_item_id:
 			result = self.__menu.aggregate([                    #runs aggregation pipeline against menu collection and converts it into a list
 				{"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
-				{"$match": {"menuItem.name": {"$regex": menu_item_ID, "$options": "i"}}}, #filters to where only the matching item remains
-				{"$project": {                                   #selects only the fields required and deletes the rest
+				{"$match": {"menuItem.name": {"$regex": menu_item_id, "$options": "i"}}}, #filters to where only the matching item remains
+				{"$project": {                                   #selects only the fields required and ignores the rest
 					"name": "$menuItem.name",
 					"price": "$menuItem.price",
 					"description": "$menuItem.description",
@@ -195,86 +186,92 @@ class Server:
 
 		return result
 
-	#order functions
+	# Order functions
+
 	# for order identification we are using the given _id from mongodb
-	def create_order(self, building: str, room: str, subtotal: float, instructions: str, customer: str, vendor: str, cart: list[dict]):
+	def create_order(self, building: str, room: str, subtotal: float, instructions: str, customer: str, vendor: str, cart: list[dict]) -> str:
 		order_doc = {
 			"building": building,
 			"room": room,
 			"subTotal": subtotal,
 			"specialInstructions": instructions,
 			"customer": customer,
-			"vendor": vendor,
+			"vendor": vendor.title(),	# Make sure vendor name is capitalized properly
 			"cartItem": cart,
 			"orderStatus": "Pending",
-			"orderTime": datetime.now().strftime("%H%M")	# I think this should be just datetime.now()?
+			"orderTime": datetime.now()
 		}
 
 		result = self.__order.insert_one(order_doc)
-		return result.inserted_id
+		return str(result.inserted_id)
 
 
-	def get_order(self, order_ID: str) -> dict:
-		result = self.__order.find_one({"_id": ObjectId(order_ID)})
+	def get_order_by_id(self, order_id: str) -> dict:
+		result = self.__order.find_one({"_id": ObjectId(order_id)})
 		return result
 
 
-	def get_order_by_user(self, user_ID: str) -> list[dict]:
-		result = self.__order.find({"customer": user_ID})
+	def get_orders_by_user(self, user_id: str) -> list[dict]:
+		result = self.__order.find({
+			"$or": [
+				{"customer": user_id},
+				{"agent": user_id}
+			]
+		})
 		return result.to_list()
 
 
-	def add_agent_to_order(self, order_ID: str, agent_name: str) -> int:
+	def add_agent_to_order(self, order_id: str, agent_id: str) -> int:
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
-			{"$set": {"agent": agent_name}}
+			{"_id": ObjectId(order_id)},
+			{"$set": {"agent": agent_id}}
 		)
 		return result.modified_count
 
 
-	def update_orderTime(self, time: datetime, order_ID: str):
+	def update_orderTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"orderTime": time}}
 		)
 		return result.modified_count
 
 
-	def update_readyTime(self, time: datetime, order_ID: str):
+	def update_readyTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"readyTime": time}}
 		)
 		return result.modified_count
 
 
-	def update_acceptTime(self, time: datetime, order_ID: str):
+	def update_acceptTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"acceptTime": time}}
 		)
 		return result.modified_count
 
 
-	def update_pickupTime(self, time: datetime, order_ID: str):
+	def update_pickupTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"pickupTime": time}}
 		)
 		return result.modified_count
 
 
-	def update_deliveryTime(self, time: datetime, order_ID: str):
+	def update_deliveryTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"deliveryTime": time}}
 		)
 		return result.modified_count
 
 
-	def update_confirmationTime(self, time: datetime, order_ID: str):
+	def update_confirmationTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
-			{"_id": ObjectId(order_ID)},
+			{"_id": ObjectId(order_id)},
 			{"$set": {"confirmationTime": time}}
 		)
 		return result.modified_count
