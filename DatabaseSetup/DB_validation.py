@@ -212,17 +212,23 @@ db.create_collection("order", validator={
 
             "agent": {
                 "bsonType": "string",
-                "description": "Name of the agent assigned to order"
+                "description": "VIU ID of the agent who accepted the order"
             },
 
             "vendor": {
                 "bsonType": "string",
+				"minLength": 9,
+				"maxLength": 9,
+				"pattern": "[0-9]{9}",
                 "description": "Name of the Vendor order is from"
             },
 
             "customer": {
                 "bsonType": "string",
-                "description": "Name of the customer who placed the order"
+				"minLength": 9,
+				"maxLength": 9,
+				"pattern": "[0-9]{9}",
+                "description": "VIU ID of the customer who placed the order"
             },
 
             "cartItem": {
