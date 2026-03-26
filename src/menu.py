@@ -2,23 +2,23 @@
 
 
 from collections import defaultdict
-from DB_init import db
 import server #or server.py
 
 class Menu():
     # Constructor for Menu
     # Initializes menu type, schedule, and publish status
-    def __init__(self, type: str, schedule: list, publishStatus: bool):
+    def __init__(self, type: str, schedule: list, publishStatus: bool, server):
 
         self.type = type
         self.schedule = schedule
         self.publishStatus = publishStatus
+        self.server = server
 
     #search by menuItem
     def viewMenu(self):
         keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes any accidental spaces
  
-    
+        """ 
         pipeline = [                         #building our mongodb pipeline
             {"$match": {"type": self.type}}, #checking menu type
             {"$unwind": "$menuItem"},        #unwinding the array of menuItem to separate menus
@@ -34,9 +34,9 @@ class Menu():
             "inStock": "$menuItem.inStock",
             "allergens": "$menuItem.allergens",
         }})
-                                                #we got to make this also in server.py!!!!!!!!!
+        """
                                                 
-        items = list(db.menu.aggregate(pipeline)) #running pipeline against the db and makes a plain python list
+        items = self.server.search_menu_items(menu_type=self.type, keyword=keyword or None) #changed to call server.py
         if not items:
             print("No items found.")         #if no menu is found then gives this message
             return
@@ -54,12 +54,9 @@ class Menu():
  
 
 
-  
-        
-
     # Returns or displays all available menus
     def viewAllMenus(self):
-        menus = server.get_all_menu #kw 
+        menus = self.server.get_all_menus() #kw 
         if not menus: 
             print("No menus are currently available.") #if there is no menus present, prints this message
             return
@@ -130,13 +127,10 @@ class MenuItem():
             {"$limit": 1}                                    #stops at the specific item
         ]))"""
 
-        #pass in menu item 
-        # needs prompt for menu item name
         menuItemID = input("Enter menu item name")
-        result = get_menu_item(menuItemID)                  #kw
-        result_list = list(result) #why is result_list greyed out
-                                    #might have broken when i fixed surya's merge conflicts
-                                    #if this works then we can remove the above database code right?
+        result_cursor = self.server.get_menu_item(menuItemID)                  #kw
+        result = list(result_cursor)
+                                     #fixed
         if not result:                                       #if the item is not found we exit the list and print the message
             print(f"Item '{self.name}' was not found in any menu.")
             return None
@@ -171,8 +165,8 @@ class MenuItem():
         ]))"""
 
     
-        result = get_menu_item() #called with null to get all menu items
-        items = list(result)     #kw
+        result_cursor = self.server.get_menu_item() #called with null to get all menu items
+        items = list(result_cursor)     #kw
                                     #this works then we can remove the code above? Bruce
         if not items:
             print("No menu items found.")                    #unlikely but if the database is empty, it will print this

@@ -2,6 +2,7 @@
 
 from typing import Type	# supports using a class as an argument for a function
 from enum import Enum	# for enumerations
+from datetime import datetime
 
 
 class Cart:
@@ -44,6 +45,7 @@ class Cart:
 			print("Quantity must be greater than 0.")	#avoiding troll inputs
 			return
 
+		"""
 		result = list(db.menu.aggregate([				#checks for availability and existence of the item. using $match combines the check
 			{"$unwind": "$menuItem"},					#unwinding the array of menuItem to separate menus
 			{"$match": {
@@ -53,8 +55,10 @@ class Cart:
 			{"$project": {"name": "$menuItem.name"}},
 			{"$limit": 1}
 		]))
-
-		if not result:
+		"""
+		result = list(self.__server.get_menu_item(menu_item))	#calling server
+  
+		if not result or not result[0].get("inStock"):
 			print(f"'{menu_item}' is out of stock.")	#if it is not available it gives this message
 			return
 
@@ -91,7 +95,7 @@ class Cart:
 
 	def calculate_subtotal(self) -> float:
 		total = 0.0
-  
+		"""
 		for item_name, qty in self.__cart_items.items():#looping through every item in the cart, giving item name and quantity
 			result = list(db.menu.aggregate([			
             {"$unwind": "$menuItem"},
@@ -99,7 +103,11 @@ class Cart:
             {"$project": {"price": "$menuItem.price"}},
             {"$limit": 1}								#for each item we check price
         ]))
-   
+		"""
+		for item_name, qty in self.__cart_item.items():	#looping through every item in the cart, giving item name and quantity
+      
+			result = list(self.__server.get_menu_item(item_name))	#for each item we check price
+	
 			if result:									#adding price accounting for the quantity
 				total += result[0]["price"] * qty	
 			
@@ -142,10 +150,12 @@ class Cart:
 			total=subtotal,
 			customer=customer,
 			vendor=vendor,
+			server=self.__server,
 		)
   
 		self.__cart_items = {}							#clearing the cart for the next order after making it into an order
 		self.__subtotal = 0.0
+  
 		return order									#returning the order does not mean the order is placed, place_order() should be called i think
 		
 
@@ -241,74 +251,78 @@ class Order:
 #──────────────────────────────────────────────
 # Other functions
 #──────────────────────────────────────────────
+
+	#I HAVE JUST UPDATED THIS ENTIRE THING TO WORK WITH SERVER.PY
 	def update_status(self, status: Type[Status]):		#with this we assume status is the status we want to change the order to
 		self.__order_status = status.value				#extracting the string
 		now = datetime.now()							#capturing the current date and time for later use
 
-		update_fields = {"orderStatus": self.__order_status} #starting the dictionary of fields to write to the db
 
 		if status == Status.READY_FOR_PICKUP:
 			self.__ready_time = now	
-			update_fields["readyTime"] = now			#status transition for ready to pickup
+			if self.__order_id:
+				self.__server.update_order_status(self.__order_id, self.__order_status)
+				self.__server.update_readyTime(now, self.__order_id)
 
 		elif status == Status.IN_TRANSIT:
 			self.__pickup_time = now
-			update_fields["pickupTime"] = now			#status transition for in transit
-
+			if self.__order_id:
+				self.__server.update_order_status(self.__order_id, self.__order_status)
+				self.__server.update_pickupTime(now, self.__order_id)
+    
 		elif status == Status.DELIVERED:
 			self.__delivery_time = now
-			update_fields["deliveryTime"] = now			#status transition for delivered
-
+			if self.__order_id:
+				self.__server.update_order_status(self.__order_id, self.__order_status)
+				self.__server.update_deliveryTime(now, self.__order_id)
+    
 		elif status == Status.RECEIVED:
 			self.__confirmation_time = now
-			update_fields["acceptTime"] = now			#might omit, transition to received
-
-		if self.__order_id:
-			db.order.update_one(
-				{"_id": self.__order_id},
-				{"$set": update_fields}					#first we check if the order exists(it should but checks are good) then we update the fields of the order using the id to find it
-			)
+			if self.__order_id:
+				self.__server.update_order_status(self.__order_id, self.__order_status)
+				self.__server.update_confirmationTime(now, self.__order_id)
+    
+		elif self.__order_id:
+			#Fallback: just update the status field for any other status. this is just a failsafe
+			self.__server.update_order_status(self.__order_id, self.__order_status)
 
 		print(f"Order status updated to: {status.value}") #prints the change to the user, will omit this later since the user does not actually need this unless they ask for it
 
 	def place_order(self) -> bool:
      
-		if not cart_items:
-			"""print("Cannot place an order with no items.")"""
+		if not self.__cart_items:
+			print("Cannot place an order with no items.")
 			return False								#sanity check for morons that want to order "nothing"
 
 		self.__placed_time = datetime.now()				#recording order time
-
+		self.__order_status = Status.PENDING.value		#setting initial status
+  
 		sanitized_items = [
 			{"name": item["name"], "qty": int(item["qty"])}
-			for item in cart_items						#List to rebuild each cart item, casting quantity as int because when i googled, mangodb messes with floats and stuff
+			for name, qty in self.__cart_items.items()	#List to rebuild each cart item, casting quantity as int because when i googled, mangodb messes with floats and stuff
 		]
 
-		order_doc = {
-			"building": self.__building,
-			"room": self.__room,
-			"subTotal": float(self.__subtotal),
-			"specialInstructions": self.__special_instructions,
-			"orderStatus": self.__order_status,
-			"orderTime": self.__placed_time,
-			"readyTime": None,
-			"acceptTime": None,
-			"pickupTime": None,
-			"deliveryTime": None,
-			"agent": self.__agent,
-			"customer": self.__customer,
-			"vendor": self.__vendor,
-			"cartItem": sanitized_items,				#i migh've missed something please double check!!!!!!
-		}												#assembling the full doc to insert
+		#changed this to call server.py for the insertion
+		self.__order_id = self.__server.create_order(
+			building=self.__building,
+			room=self.__room,
+			subtotal=float(self.__subtotal),
+			instructions=self.__special_instructions,
+			customer=self.__customer,
+			vendor=self.__vendor,
+			cart=sanitized_items,
+		)				
 
+		"""
 		result = db.order.insert_one(order_doc)			#insering the document into the collection. mango should respond with an object containing the new document's ID
 		self.__order_id = result.inserted_id			#saving the ID onto the object which all the order methods will use to find the particular order
 
-		""""
+		
 		print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
 		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
 		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
 		"""
+		self.__server.update_orderTime(self.__placed_time, self.__order_id)
   
 		return True										#returns success to the caller
 
@@ -322,6 +336,7 @@ class Order:
 		self.__accept_time = datetime.now()				#marking the time the order is accepted
 		self.__order_status = Status.IN_TRANSIT.value	#changing order status for obvious reasons
 
+		"""
 		db.order.update_one(
 			{"_id": self.__order_id},
 			{"$set": {
@@ -330,6 +345,10 @@ class Order:
 				"acceptTime": self.__accept_time,		#writing the agent, orderStatus and acceptTime to the db
 			}}
 		)
+  		"""
+		#changed this also to just call server.py
+		self.__server.accept_order(self.__order_id, agent, self.__accept_time)
+  
 		print(f"Order accepted by agent '{agent}'.")	#saying who actually accepted the order
 
 	def mark_complete(self):
@@ -340,7 +359,8 @@ class Order:
 
 		self.__delivery_time = datetime.now()			#marking delivery time
 		self.__order_status = Status.RECEIVED.value		#updaing the orderStatus
-
+  
+		"""
 		db.order.update_one(
 			{"_id": self.__order_id},
 			{"$set": {
@@ -348,6 +368,9 @@ class Order:
 				"deliveryTime": self.__delivery_time,	#actually writing the changes to the db
 			}}
 		)
+		"""
+		#calling server.py instead of mixing layers
+		self.__server.complete_order(self.__order_id, self.__delivery_time)
   
 		print("Order marked as complete.")				#messaging that the order is complete
 
@@ -386,7 +409,10 @@ class Order:
 		return order_dict								#i have lost my mind
 
 	def view_all_orders(self) -> list[dict]:
-		orders = list(db.order.find())
+		
+		#changed this to call server.py
+		orders = self.__server.get_all_orders()
+  
 		if not orders:
 			print("No orders found.")
 			return []									#this is cwaaaaazy, no orders at all?????????

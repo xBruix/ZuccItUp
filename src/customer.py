@@ -3,6 +3,7 @@
 import notification     #importing member functions from notification.py
 import order            #importing member functions from order.py
 import menu             #importing member functions from menu.py
+import order
 
 ## Notification.py
 #viewNotification
@@ -12,12 +13,12 @@ import menu             #importing member functions from menu.py
 ## order.py
 #place_Order
 def customer_place_order(self):
-    message : bool = place_Order(self)    #calls place_order function from order.py and stores in message variable
-    if message :
+    message : bool = order.place_order(self)    #calls place_order function from order.py and stores in message variable
+    if message:
         print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
         print(f"Delivering to: Building {self.__building}, Room {self.__room}")
         print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
-    else :
+    else:
         print("Cannot place an order with no items.")
 
 

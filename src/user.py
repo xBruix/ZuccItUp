@@ -10,6 +10,7 @@ class User:
     # Initializes common attributes shared by all users
     def __init__(self, name: str, email: str, role: str):
 
+        User.__init__(self, name, email, role)
         self.name = name
         self.email = email
         self.role = role
@@ -27,11 +28,12 @@ class DeliveryAgent(User):
         User.__init__(self, name, email, role)
         self.VIUID = VIUID
         self.availibilityStatus = availibilityStatus
+        self.server = server
 
     # Creates a new delivery agent in the system
     def createAgent(self):
-        existing = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})     #finding if the db already has an agent with the given VIUID
-        if existing:
+        #finding if the db already has an agent with the given VIUID
+        if self.server.verify_user(self.VIUID):
             print(f"Agent with VIUID {self.VIUID} already exists.")
             return None                                                         #error message if the user already exists
     
@@ -45,13 +47,16 @@ class DeliveryAgent(User):
         result = db.user.insert_one(agent_doc)
                                           """    
         #kw
-        result = create_user(self.email,self.name,self.VIUID,"agent",self.availibilityStatus)#inserting the agent into the db  
+        result = self.server.create_user(
+            self.email, self.name, self.VIUID, "agent", self.availibilityStatus
+        )                                                                       #inserting the agent into the db  
         print(f"Agent '{self.name}' created successfully.")
-        return result.inserted_id                                               #now we print the ID as is in the db
+        
+        return result                                                           #now we print the ID as is in the db
 
     # Returns details of a specific delivery agent
     def viewAgent(self):
-        agent = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})        #search for the VIUID since that is the unique marker
+        agent = self.server.view_user(self.VIUID)                               #search for the VIUID since that is the unique marker
         
         if not agent:
             print(f"No agent found with VIUID {self.VIUID}.")
@@ -65,11 +70,12 @@ class DeliveryAgent(User):
         print(f"  VIUID:      {agent.get('VIUID')}")
         print(f"  Status:     {status}")                                        #printing the lovely details
         print("─" * 40)                                                         #divider
+        
         return agent                                                            #returns the agent as is
         
     # Returns a list of all delivery agents
     def viewAllAgents(self):
-        agents = list(view_all_user(agent))      #kw                            #we want a list of the agents
+        agents = self.server.view_all_user("agent")     #kw                            #we want a list of the agents
                                                  #view_all_user is not defined and not in camel Case
         if not agents:                                                          #NO AGENTS?!?!?!!?
             print("No delivery agents found.")  
@@ -92,7 +98,7 @@ class DeliveryAgent(User):
     def verifyVIUID(self):
 
         
-        result = db.user.find_one({"VIUID": self.VIUID, "role": "Agent"})       #lets find the agent to see if they exist
+        result = self.server.verify_user(self.VIUID)       #lets find the agent to see if they exist
         
         if result:
             print(f"VIUID {self.VIUID} verified for agent '{self.name}'.")
@@ -101,10 +107,7 @@ class DeliveryAgent(User):
         return False                                                            #unverified
 
     def setAvailability(self, status: bool):
-        db.user.update_one(
-            {"VIUID": self.VIUID, "role": "Agent"},
-            {"$set": {"availabilityStatus": status}}
-        )                                                                       #lets find and update the status if we find the agent
+        self.server.update_availability(self.VIUID, status)                     #lets find and update the status if we find the agent
         self.availibilityStatus = status
         print(f"Agent '{self.name}' is now {'available' if status else 'unavailable'}.")    #appropriate message
  
@@ -121,20 +124,19 @@ class Customer(User):
 
     # Constructor for Customer
     # Adds VIU ID and tracks previous orders
-    def __init__(self, VIUID: int, name: str, email: str, role: str):
+    def __init__(self, VIUID: int, name: str, email: str, role: str, server):
         User.__init__(self, name, email, role)
         self.VIUID = VIUID
-        self.previouslyOrdered
+        self.previouslyOrdered = []
+        self.server = server
 
     # Creates a new customer in the system
     def createCustomer(self):
-
-        if verify_user(self.VIUID):
-            existing = True
         
-        if existing:
+        if self.server.verify_user(self.VIUID):
             print(f"Customer with VIUID {self.VIUID} already exists.")          #if it exists, why create??????
             return None
+        
         """
         customer_doc = {
             "name": self.name,
@@ -142,16 +144,18 @@ class Customer(User):
             "VIUID": self.VIUID,
             "role": self.role,
             "previouslyOrdered": self.previouslyOrdered,
-        }  """                                                                     #details of the customer to add to the db
+        }  """                                                                  #details of the customer to add to the db
     
         #result = db.user.insert_one(customer_doc)
-        result = create_user(self.email,self.name,self.VIUID,"customer")       #kw            
+        result = self.server.create_user(self.email,self.name,self.VIUID,"customer")        #kw            
         print(f"Customer '{self.name}' created successfully.")                  #done yay
-        return result.inserted_id                                               #returning the ID as inserted into mangoDB
+        return result                                            #returning the ID as inserted into mangoDB
 
     # Returns details of a specific customer
     def viewCustomer(self):
-        customer = view_user(self.VIUID)
+        
+        customer = self.server.view_user(self.VIUID)
+        
         if not customer:
             print(f"No customer found with VIUID {self.VIUID}.")
             return None                                                         #can't view someone that does not exist
@@ -159,12 +163,10 @@ class Customer(User):
         previously = ", ".join(customer.get("previouslyOrdered", [])) or "None" #adding the previously ordered items
         
         print("\n" + "─" * 40)                                                  #divider
-        
         print(f"  Name:               {customer.get('name')}")
         print(f"  Email:              {customer.get('email')}")
         print(f"  VIUID:              {customer.get('VIUID')}")
         print(f"  Previously Ordered: {previously}")                            #printing the details of the customer
-        
         print("─" * 40)                                                         #divider be like
         
         return customer                                                         #returning the customer to the caller
@@ -172,7 +174,7 @@ class Customer(User):
     # Returns a list of all customers
     def viewAllCustomers(self):
         
-        customers = list(view_all_user("customer"))     #kw               #pulling the list of customers from Mango
+        customers = self.server.view_all_user("customer")    #kw               #pulling the list of customers from Mango
         
         if not customers:
             print("No customers found.")
@@ -194,7 +196,7 @@ class Customer(User):
     def verifyVIUID(self):
 
         
-        result = db.user.find_one({"VIUID": self.VIUID, "role": "Customer"})       #lets find the agent to see if they exist
+        result = self.server.verify_user(self.VIUID)       #lets find the agent to see if they exist
         
         if result:
             print(f"VIUID {self.VIUID} verified for Customer '{self.name}'.")

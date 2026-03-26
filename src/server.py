@@ -109,7 +109,13 @@ class Server:
 	def view_user(self, viu_id: str) -> dict:
 		return self.__user.find_one({"VIUID": viu_id})
 
-
+	def update_availability(self, viu_ID: str, status: bool) -> int:
+		result = self.__user.update_one(	
+			{"VIUID": viu_ID, "role": "agent"},
+			{"$set": {"availabilityStatus": status}}	#updates if the agent with this viuid exists
+		)
+		return result.modified_count					#retuns 1 if changed, 0 if not
+  
 	# Menu functions
 
 	# whichever param is filled will change the query,
@@ -183,6 +189,32 @@ class Server:
 
 	# Order functions
 
+	def search_menu_items(self, menu_type: str=None, keyword: str=None) -> list[dict]:
+		pipeline = []
+ 
+		if menu_type:
+			pipeline.append({"$match": {"type": menu_type}})	#filtering by menu type first
+ 
+		pipeline.append({"$unwind": "$menuItem"})				#unwinding the menuItem array
+ 
+		if keyword:
+			pipeline.append(
+				{"$match": {"menuItem.name": {"$regex": keyword, "$options": "i"}}}
+			)													#checking for the match
+ 
+		pipeline.append({"$project": {
+			"name": "$menuItem.name",
+			"price": "$menuItem.price",
+			"description": "$menuItem.description",
+			"inStock": "$menuItem.inStock",
+			"allergens": "$menuItem.allergens",
+		}})
+ 
+		result = self.__menu.aggregate(pipeline)
+		return result.to_list()									#returning the matching menu item documents
+
+
+	#order functions
 	# for order identification we are using the given _id from mongodb
 	def create_order(self, building: str, room: str, subtotal: float, instructions: str, customer: str, vendor: str, cart: list[dict]) -> str:
 		order_doc = {
@@ -194,7 +226,14 @@ class Server:
 			"vendor": vendor.title(),	# Make sure vendor name is capitalized properly
 			"cartItem": cart,
 			"orderStatus": "Pending",
-			"orderTime": datetime.now()
+			"orderTime": datetime.now(),
+   
+			"readyTime": None,
+			"acceptTime": None,
+			"pickupTime": None,
+			"deliveryTime": None,
+			"confirmationTime": None,
+			"agent": "",										#do we not need these?
 		}
 
 		result = self.__order.insert_one(order_doc)
@@ -214,14 +253,45 @@ class Server:
 		})
 		return result.to_list()
 
+	def get_all_orders(self) -> list[dict]:
+		result = self.__order.find()
+		return result.to_list()									#returning all the orders (lets have this for defveloper access)
 
-	def add_agent_to_order(self, order_id: str, agent_id: str) -> int:
+	#adds agent name to the order with _id
+	def add_agent_to_order(self, order_ID: str, agent_name: str) -> int:
 		result = self.__order.update_one(
 			{"_id": ObjectId(order_id)},
 			{"$set": {"agent": agent_id}}
 		)
 		return result.modified_count
 
+	def update_order_status(self, order_ID: str, status: str) -> int:
+		result = self.__order.update_one(
+			{"_id": ObjectId(order_ID)},						#specific ID we got to change it for
+			{"$set": {"orderStatus": status}}					#changing the order status
+		)
+		return result.modified_count							#returns 1 if successful, 0 if not
+ 
+	def accept_order(self, order_ID: str, agent_name: str, accept_time: datetime) -> int:
+		result = self.__order.update_one(
+			{"_id": ObjectId(order_ID)},
+			{"$set": {
+				"agent": agent_name,
+				"orderStatus": "In Transit",
+				"acceptTime": accept_time,
+			}}													#assigning agent to the order and marking it as accepted
+		)
+		return result.modified_count							#number of documents modified
+ 
+	def complete_order(self, order_ID: str, delivery_time: datetime) -> int:
+		result = self.__order.update_one(
+			{"_id": ObjectId(order_ID)},
+			{"$set": {
+				"orderStatus": "Received",
+				"deliveryTime": delivery_time,
+			}}													#changing order status to received and marks delivery time
+		)
+		return result.modified_count							#returns the number of documents modified
 
 	def update_orderTime(self, time: datetime, order_id: str):
 		result = self.__order.update_one(
