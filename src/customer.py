@@ -1,9 +1,8 @@
 # Authors: Surya Balram
 
 import notification     #importing member functions from notification.py
-import order            #importing member functions from order.py
-import menu             #importing member functions from menu.py
-import order
+from order import Order,Cart            #importing member functions from order.py
+from menu import Menu            #importing member functions from menu.py
 
 ## Notification.py
 #viewNotification
@@ -12,7 +11,7 @@ import order
 
 ## order.py
 #place_Order
-def customer_place_order(self):
+def customer_place_order(self, order : Order):
     message : bool = order.place_order(self)    #calls place_order function from order.py and stores in message variable
     if message:
         print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
@@ -44,9 +43,9 @@ def customer_view_cart(self):
 
 ## menu.py
 #viewMenu = input
-def customer_view_menu(self):
+def customer_view_menu(self, menu : Menu):
     keyword = input("Search keyword (leave blank for all): ").strip()   #asks user to input a search keyword, and stores in keyword variable
-    view_menu(self, keyword)            #passes keyword to view_menu function from menu.py
+    menu.view_menu(self, keyword)            #passes keyword to view_menu function from menu.py
 
 #viewAllMenus
 def customer_view_all_menus(self):
