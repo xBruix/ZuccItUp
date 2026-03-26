@@ -112,29 +112,18 @@ class Server:
 
 	# Menu functions
 
-	#gets all vendor names
-
-	# NOTE: we don't need get_vendors since you could just call view_all_users("Vendor") to do the same thing
-	# def get_vendors(self) -> list[dict]:
-	# 	result = self.__menu.distinct("vendor")
-	#
-	# 	""" for vendor in result
-	# 		print(f" - {vendor}")   #print example for distinct vendors that have menus
-	# 	"""
-	# 	return result
-
 	# whichever param is filled will change the query,
 	# if vendor_id=upper cafe's ID it will display upper cafe menus
 	# if menuItem = coffee it will find menu with coffee
 	# null of all should return all menus
-	def get_all_menus(self, vendor_id: str=None, menu_item: str=None, menu_type: str=None) -> list[dict]:
+	def get_all_menus(self, vendor_name: str=None, item_name: str=None, menu_type: str=None) -> list[dict]:
 		query = {}
 
-		if vendor_id:
-			query["vendor"] = vendor_id
+		if vendor_name:
+			query["vendor"] = vendor_name.title()
 
-		if menu_item:
-			query["menuItem"] = menu_item
+		if item_name:
+			query["menuItem.name"] = item_name
 
 		if menu_type:
 			query["type"] = menu_type.title()	# Capitalizes the string
@@ -144,9 +133,9 @@ class Server:
 
 	#by type and/or by vendor
 	# both params are used it will display the menu with both conditions
-	def get_one_menu(self, vendor_id: str, menu_type: str) -> dict:
+	def get_one_menu(self, vendor_name: str, menu_type: str) -> dict:
 		query = {
-			"vendor": vendor_id,
+			"vendor": vendor_name.title(),
 			"type": menu_type.title()
 		}
 		return self.__menu.find_one(query)
@@ -154,25 +143,29 @@ class Server:
 	#used by view Item or view all items
 	# with param means display one menu item
 	# with param = null display all menus
-	def get_menu_item(self, menu_item_id: str = None) -> dict:
+	def get_menu_item(self, item_name: str = None) -> dict:
 
-		if menu_item_id:
+		if item_name:
 			result = self.__menu.aggregate([                    #runs aggregation pipeline against menu collection and converts it into a list
 				{"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
-				{"$match": {"menuItem.name": {"$regex": menu_item_id, "$options": "i"}}}, #filters to where only the matching item remains
+				{"$match": {"menuItem.name": {"$regex": item_name, "$options": "i"}}}, #filters to where only the matching item remains
 				{"$project": {                                   #selects only the fields required and ignores the rest
 					"name": "$menuItem.name",
 					"price": "$menuItem.price",
 					"description": "$menuItem.description",
 					"inStock": "$menuItem.inStock",
 					"allergens": "$menuItem.allergens",          #from "name" till this line, pulls fields from the unwound menuItem and allows acess as just item["name"]
-					"location": "$location",
+					"vendor": "$vendor",
 					"menuType": "$type",                         #these two lines pull fields from the menu document to find location and menuType the item belongs
 				}},
 				{"$limit": 1}
 			])
-			return result
+			return result.to_list()[0]
 
+		# Why is this here??
+		# I guess it could be useful to get a list of all available menu items....
+		# But the way this is described in the comments is that it's supposed to display all menus...
+		# We have get_all_menus() for that.
 		result = self.__menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
 				{"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
 				{"$project": {                                   #selects the fields we want to output
@@ -180,13 +173,13 @@ class Server:
 					"price": "$menuItem.price",
 					"description": "$menuItem.description",
 					"inStock": "$menuItem.inStock",              #pulls the four fields from the unwound menuItem in the form item["name"], item["price"] and such
-					"location": "$location",
+					"vendor": "$vendor",
 					"menuType": "$type",                         #pulling these two fields from the menu document to find the location and menuType for each item
 				}},
-				{"$sort": {"location": 1, "menuType": 1, "name": 1}} #sorts the results by location, then menuType and then name alphabetically, grouping the output logically by place, type and such
+				{"$sort": {"vendor": 1, "menuType": 1, "name": 1}} #sorts the results by vendor, then menuType and then name alphabetically, grouping the output logically by place, type and such
 			])
 
-		return result
+		return result.to_list()
 
 	# Order functions
 
