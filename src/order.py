@@ -274,7 +274,7 @@ class Order:
 	def place_order(self) -> bool:
      
 		if not cart_items:
-			print("Cannot place an order with no items.")
+			"""print("Cannot place an order with no items.")"""
 			return False								#sanity check for morons that want to order "nothing"
 
 		self.__placed_time = datetime.now()				#recording order time
@@ -303,10 +303,12 @@ class Order:
 
 		result = db.order.insert_one(order_doc)			#insering the document into the collection. mango should respond with an object containing the new document's ID
 		self.__order_id = result.inserted_id			#saving the ID onto the object which all the order methods will use to find the particular order
-  
+
+		""""
 		print(f"\nOrder placed successfully! Order ID: {self.__order_id}")
 		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
 		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
+		"""
   
 		return True										#returns success to the caller
 
