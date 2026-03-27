@@ -42,6 +42,13 @@ db.create_collection("user", validator={
                 "maxLength": 9,
                 "pattern": "[0-9]{9}"
             },
+
+			# REQUIRED for all user types
+			# This should be a hashed password -- DO NOT store the password as plaintext. Encrypt it first.
+			"password": {
+				"bsonType": "string",
+			},
+
             # REQUIRED for all user types
             "role": {
                 "bsonType": "string",

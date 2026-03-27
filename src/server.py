@@ -1,7 +1,8 @@
 # Authors: Caleb, Keenan
-from datetime import datetime
-from pymongo import MongoClient as MangoClient
-from bson.objectid import ObjectId
+from datetime import datetime						# for handling times and dates
+from pymongo import MongoClient as MangoClient		# MangoDB Client
+from bson.objectid import ObjectId					# for MangoDB _id
+import bcrypt										# for hashing and salting passwords
 
 #See code plan in A6 document for details on each function
 
@@ -49,19 +50,36 @@ class Server:
 		"""Severs the connection to the database server"""
 		self.__client.close()
 
-	def verify_user(self, viu_id: str) -> bool:
-		result = self.__user.find_one({
-			"VIUID": viu_id
-		})
-		return result is not None
+	# Two helper functions for hashing and salting passwords
+	# Here's where I got the code: https://stackoverflow.com/questions/9594125/salt-and-hash-a-password-in-python
+	#
+	# The .encode() method converts a string into a literal byte sequence, which is the data type that bcrypt uses.
+	# Explanation here: https://stackoverflow.com/questions/6269765/what-does-the-b-character-do-in-front-of-a-string-literal
+	def generate_hashed_password(self, plaintext_passwd: str) -> str:
+		return bcrypt.hashpw(plaintext_passwd.encode('UTF-8'), bcrypt.gensalt(12)).decode('UTF-8')
 
-	def create_user(self, email: str, name: str, viu_id: str, role: str, availability_status: bool = None):
+	def check_hashed_password(self, plaintext_passwd: str, ciphertext_password: str) -> bool:
+		return bcrypt.checkpw(plaintext_passwd.encode('UTF-8'), ciphertext_password.encode('UTF-8'))
+
+	def verify_user(self, viu_id: str, passwd: str) -> bool:
+		result = self.__user.find_one({
+			"VIUID": viu_id,
+		})
+		if result is None:
+			return False
+		elif self.check_hashed_password(passwd, result["password"]):
+			return True
+		else:
+			return False
+
+	def create_user(self, viu_id: str, passwd: str, email: str, name: str,  role: str, availability_status: bool = None):
 		"""
 		Inserts a new user to the user collection. If the user already exists, it sets their status to active.
 		Parameters:
+		:param viu_id: The user's VIU ID number (9 digits)
+		:param passwd: The plaintext password entered by the user
 		:param email: A valid email address
 		:param name: The user's name
-		:param viu_id: The user's VIU ID number (9 digits)
 		:param role: Must be either 'customer' or 'agent'
 		:param availability_status: Optional, true for available, false for unavailable
 
@@ -69,16 +87,21 @@ class Server:
 		:raises ValueError: If an invalid parameter is given. A parameter is invalid if it doesn't align
 		with the criteria in DB_validation.py
 		"""
-		if self.verify_user(viu_id):
+		if self.verify_user(viu_id, passwd):
 			self.__user.update_one(
 				{"VIUID": viu_id},
-				{"$set": {"active": True}}
+				{"$set": {
+					"active": True,
+					"password": self.generate_hashed_password(passwd)
+					}
+				}
 			)
 
 		new_user_doc = {
 			"name": name,
 			"email": email,
 			"VIUID": viu_id,
+			"password": self.generate_hashed_password(passwd),
 			"role": role.title(),	# Ensures that the role is capitalized
 			"active": True,
 			"previouslyOrdered": []
@@ -95,19 +118,21 @@ class Server:
 	def deactivate_user(self, viu_id: str):
 		result = self.__user.update_one(
 			{"VIUID": viu_id},
-			{"$set":
-				 {"active": False}
+			{"$set": {
+				"active": False,
+				"previouslyOrdered": []
+				}
 			}
 		)
 		if result.matched_count == 0:
 			raise ValueError("Invalid VIU ID in deactivate_user()")
 
 	def view_all_users(self, role: str) -> list[dict]:
-		results = self.__user.find({"role": role})
+		results = self.__user.find({"role": role}, {"password": 0})		# Don't include password in return value
 		return results.to_list()
 
 	def view_user(self, viu_id: str) -> dict:
-		return self.__user.find_one({"VIUID": viu_id})
+		return self.__user.find_one({"VIUID": viu_id}, {"password": 0})		# Don't include password in return value
 
 	def update_availability(self, viu_ID: str, status: bool) -> int:
 		result = self.__user.update_one(	
