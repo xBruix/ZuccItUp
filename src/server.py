@@ -67,7 +67,7 @@ class Server:
 		})
 		if result is None:
 			return False
-		elif self.check_hashed_password(passwd, result["password"]):
+		elif self.check_hashed_password(passwd, result["password"]) and result["active"]:
 			return True
 		else:
 			return False
