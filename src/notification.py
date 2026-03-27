@@ -14,7 +14,7 @@ STATUS_MESSAGES = {
         "Order Ready for Pickup",
         "Your order from {vendor} is packaged and ready to be picked up by a delivery agent.",
     ),
-    "In Transit": (
+    "InTransit": (
         "Order On Its Way",
         "Your order from {vendor} has been accepted by {agent} and is on its way!",
     ),
