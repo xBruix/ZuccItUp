@@ -6,6 +6,7 @@
 
 import copy					# For making deep copies of parent classes
 from server import Server
+from debug import DEBUG_MODE
 
 class User:
 	# Constructor for the base User class
@@ -33,9 +34,10 @@ class User:
 		if is_in_db:
 			self.__current_user = viu_id
 			self.__role = self.__server.view_user(viu_id)["role"]
-			# DEBUG
-			print("Current user: ", self.__current_user)
-			print("Role: ", self.__role)
+
+			if DEBUG_MODE:
+				print("Current user: ", self.__current_user)
+				print("Role: ", self.__role)
 		return is_in_db
 
 	def logout(self):
