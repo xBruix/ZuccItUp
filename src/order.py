@@ -206,7 +206,7 @@ class Order:
 		self.__agent = ""
 		self.__order_id = ""
 		self.__order_status = ""
-		self.__placed_time = ""
+		self.__order_time = ""
 		self.__ready_time = ""
 		self.__accept_time = ""
 		self.__pickup_time = ""
@@ -228,8 +228,8 @@ class Order:
 		return self.__order_status
 
 	def get_time(self, time_enum: Type[Time]) -> str:
-		if time_enum == Time.PLACED:
-			return self.__placed_time
+		if time_enum == Time.ORDER:
+			return self.__order_time
 		elif time_enum == Time.READY:
 			return self.__ready_time
 		elif time_enum == Time.ACCEPT:
@@ -294,7 +294,7 @@ class Order:
 			print("Cannot place an order with no items.")
 			return False								#sanity check for morons that want to order "nothing"
 
-		self.__placed_time = datetime.now()				#recording order time
+		self.__order_time = datetime.now()				#recording order time
 		self.__order_status = Status.PENDING.value		#setting initial status
   
 		sanitized_items = [
@@ -322,7 +322,7 @@ class Order:
 		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
 		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
 		"""
-		self.__server.update_orderTime(self.__placed_time, self.__order_id)
+		self.__server.update_orderTime(self.__order_time, self.__order_id)
   
 		return True										#returns success to the caller
 
@@ -385,7 +385,7 @@ class Order:
 			"subtotal": self.__subtotal,
 			"status": self.__order_status,
 			"special_instructions": self.__special_instructions,
-			"placed_time": self.__placed_time,
+			"order_time": self.__order_time,
 			"accept_time": self.__accept_time,
 			"ready_time": self.__ready_time,
 			"pickup_time": self.__pickup_time,
@@ -403,8 +403,8 @@ class Order:
 		print(f"  Status:        {self.__order_status}")							#THIS BE THE STATUS
 		if self.__special_instructions:
 			print(f"  Instructions:  {self.__special_instructions}")				#maybe it's special, maybe it's not
-		if self.__placed_time:
-			print(f"  Placed at:     {self.__placed_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
+		if self.__order_time:
+			print(f"  Placed at:     {self.__order_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
 		print("─" * 50)									#divider
 		return order_dict								#i have lost my mind
 
