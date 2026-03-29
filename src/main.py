@@ -43,7 +43,7 @@ def input_str(msg: str, regex_pattern: str = None) -> str:
 		return check_logout_or_quit(input(msg))
 
 	# Else, we need to check if the answer is valid -- i.e. that it matches regex_pattern
-	matching = True
+	matching = False
 	answer = ""
 	while not matching:
 		answer = check_logout_or_quit(input(msg))
