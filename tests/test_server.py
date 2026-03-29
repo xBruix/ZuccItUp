@@ -1,6 +1,6 @@
 import pytest
 from pymongo import MongoClient
-from server import Server
+from src.server import Server
 from unittest.mock import patch, MagicMock
 
 """Unit Tests for server.py and DB actions"""
