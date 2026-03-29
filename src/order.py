@@ -3,6 +3,7 @@
 from typing import Type	# supports using a class as an argument for a function
 from enum import Enum	# for enumerations
 from datetime import datetime
+from server import Server
 
 
 class Cart:
@@ -168,12 +169,12 @@ class Cart:
 # Short enum class for order times:
 #──────────────────────────────────────────────
 class Time(Enum):
-	ORDER = "ORDER"
-	READY = "READY"
-	ACCEPT = "ACCEPT"
-	PICKUP = "PICKUP"
-	DELIVERY = "DELIVERY"
-	CONFIRMATION = "CONFIRMATION"
+	ORDER = "Order"
+	READY = "Ready"
+	ACCEPT = "Accept"
+	PICKUP = "Pickup"
+	DELIVERY = "Delivery"
+	CONFIRMATION = "Confirmation"
 #──────────────────────────────────────────────
 # End of Time class
 #──────────────────────────────────────────────
@@ -184,19 +185,19 @@ class Time(Enum):
 #──────────────────────────────────────────────
 class Status(Enum):
 	# Not quite sure how to do this, but here's some ideas:
-	# PENDING = "PENDING"	# waiting for agent to accept the order
-	# READY_FOR_PICKUP = "READY_FOR_PICKUP"
-	# IN_TRANSIT = "IN_TRANSIT"
-	# DELIVERED = "DELIVERED"
-	# RECEIVED = "RECEIVED"
-	pass
+	PENDING = "Pending"	# waiting for agent to accept the order
+	READY_FOR_PICKUP = "ReadyForPickup"
+	IN_TRANSIT = "InTransit"
+	DELIVERED = "Delivered"
+	RECEIVED = "Received"
 #──────────────────────────────────────────────
 # End of Status class
 #──────────────────────────────────────────────
 
 
 class Order:
-	def __init__(self, building: str, room: str, total: float, instructions: str, customer: str, vendor: str):
+	def __init__(self, svr: Server, building: str, room: str, total: float, instructions: str, customer: str, vendor: str):
+		self.__server = svr
 		self.__building = building
 		self.__room = room
 		self.__subtotal = total
@@ -206,7 +207,7 @@ class Order:
 		self.__agent = ""
 		self.__order_id = ""
 		self.__order_status = ""
-		self.__placed_time = ""
+		self.__order_time = ""
 		self.__ready_time = ""
 		self.__accept_time = ""
 		self.__pickup_time = ""
@@ -228,8 +229,8 @@ class Order:
 		return self.__order_status
 
 	def get_time(self, time_enum: Type[Time]) -> str:
-		if time_enum == Time.PLACED:
-			return self.__placed_time
+		if time_enum == Time.ORDER:
+			return self.__order_time
 		elif time_enum == Time.READY:
 			return self.__ready_time
 		elif time_enum == Time.ACCEPT:
@@ -294,7 +295,7 @@ class Order:
 			print("Cannot place an order with no items.")
 			return False								#sanity check for morons that want to order "nothing"
 
-		self.__placed_time = datetime.now()				#recording order time
+		self.__order_time = datetime.now()				#recording order time
 		self.__order_status = Status.PENDING.value		#setting initial status
   
 		sanitized_items = [
@@ -322,7 +323,7 @@ class Order:
 		print(f"Delivering to: Building {self.__building}, Room {self.__room}")
 		print(f"Subtotal: ${self.__subtotal:.2f}")		#print statements indicating important info
 		"""
-		self.__server.update_orderTime(self.__placed_time, self.__order_id)
+		self.__server.update_orderTime(self.__order_time, self.__order_id)
   
 		return True										#returns success to the caller
 
@@ -336,18 +337,9 @@ class Order:
 		self.__accept_time = datetime.now()				#marking the time the order is accepted
 		self.__order_status = Status.IN_TRANSIT.value	#changing order status for obvious reasons
 
-		"""
-		db.order.update_one(
-			{"_id": self.__order_id},
-			{"$set": {
-				"agent": agent,
-				"orderStatus": self.__order_status,
-				"acceptTime": self.__accept_time,		#writing the agent, orderStatus and acceptTime to the db
-			}}
-		)
-  		"""
-		#changed this also to just call server.py
-		self.__server.accept_order(self.__order_id, agent, self.__accept_time)
+		self.__server.add_agent_to_order(order_id=self.__order_id, agent_id=self.__agent)
+		self.__server.update_order_status(order_id=self.__order_id, status=self.__order_status)
+		self.__server.update_acceptTime(time=self.__accept_time, order_id=self.__order_id)
   
 		print(f"Order accepted by agent '{agent}'.")	#saying who actually accepted the order
 
@@ -358,19 +350,9 @@ class Order:
 			return										#yet another check for the system not to break completely
 
 		self.__delivery_time = datetime.now()			#marking delivery time
-		self.__order_status = Status.RECEIVED.value		#updaing the orderStatus
-  
-		"""
-		db.order.update_one(
-			{"_id": self.__order_id},
-			{"$set": {
-				"orderStatus": self.__order_status,
-				"deliveryTime": self.__delivery_time,	#actually writing the changes to the db
-			}}
-		)
-		"""
-		#calling server.py instead of mixing layers
-		self.__server.complete_order(self.__order_id, self.__delivery_time)
+		self.__order_status = Status.DELIVERED.value		#updaing the orderStatus
+		self.__server.update_order_status(order_id=self.__order_id, status=self.__order_status)
+		self.__server.update_orderTime(time=self.__delivery_time, order_id=self.__order_id)
   
 		print("Order marked as complete.")				#messaging that the order is complete
 
@@ -385,7 +367,7 @@ class Order:
 			"subtotal": self.__subtotal,
 			"status": self.__order_status,
 			"special_instructions": self.__special_instructions,
-			"placed_time": self.__placed_time,
+			"order_time": self.__order_time,
 			"accept_time": self.__accept_time,
 			"ready_time": self.__ready_time,
 			"pickup_time": self.__pickup_time,
@@ -403,8 +385,8 @@ class Order:
 		print(f"  Status:        {self.__order_status}")							#THIS BE THE STATUS
 		if self.__special_instructions:
 			print(f"  Instructions:  {self.__special_instructions}")				#maybe it's special, maybe it's not
-		if self.__placed_time:
-			print(f"  Placed at:     {self.__placed_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
+		if self.__order_time:
+			print(f"  Placed at:     {self.__order_time.strftime('%Y-%m-%d %H:%M')}") #is it placed? or maybe it is not?!?!?!
 		print("─" * 50)									#divider
 		return order_dict								#i have lost my mind
 
