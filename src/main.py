@@ -1,7 +1,7 @@
 from server import Server
 from menu import Menu
 from order import Order
-from user import User, Customer, DeliveryAgent, Vendor
+from user import User, Customer, DeliveryAgent
 from getpass import getpass		# for typing password without showing letters
 import sys						# to exit program
 import re						# for regex
