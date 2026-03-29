@@ -292,7 +292,7 @@ class Server:
 		"""
 		Creates a new order document and sets all the properties named in the parameter list:
 		:param building: A 3-digit string number between 100 and 499
-		:param room: A 3- or 4-digit string number between 100 and 599 (the 4th optional digit is a letter, e.g. '315a')
+		:param room: A 3- or 4-digit string number between 100 and 599 (the 4th optional digit is a letter, e.g. '215a')
 		:param subtotal: The subtotal cost of the order
 		:param instructions: Any special instructions given by the user (leave as empty string if none)
 		:param customer: The VIU ID of the customer

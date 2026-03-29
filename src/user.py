@@ -278,30 +278,3 @@ class Customer(User):
 			return True                                                         #if verified, less print it
 		print(f"VIUID {self.VIUID} could not be verified.")
 		return False
-
-
-
-#IDK IF YOU GUYS WANT ME TO ACTUALLY CODE THIS PART??
-#──────────────────────────────────────────────
-# vEnDoR
-#──────────────────────────────────────────────
-
-# Vendor class inherits from User
-# Represents a food vendor on campus
-
-class Vendor(User):
-
-	# Constructor for Vendor
-	# Stores vendor location and hours of operation
-	def __init__(self, location: str, hoursOfOperations: list, name: str, email: str, role: str):
-		User.__init__(self, name, email, role)
-		self.location = location
-		self.hoursOfOperations = hoursOfOperations
-
-	# Returns details of a specific vendor
-	def viewVendor(self):
-		pass
-
-	# Returns a list of all vendors
-	def viewAllVendors(self):
-		pass
