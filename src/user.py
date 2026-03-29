@@ -5,8 +5,9 @@
 # DeliveryAgent, Customer, and Vendor.
 
 from server import Server
-from debug import DEBUG_MODE
-from datetime import datetime
+from debug import DEBUG_MODE		# for debug mode
+from copy import copy				# for making shallow copies of parent classes
+from datetime import datetime		# for handling times and dates
 from prettytable import PrettyTable
 # See how to use PrettyTable: https://pypi.org/project/prettytable/
 
@@ -88,7 +89,7 @@ class DeliveryAgent(User):
 		"""
 		if len(args) == 1:			# Make a shallow copy of the User object passed in
 			if type(args[0]) is User:
-				self.__dict__ = args[0].__dict__.copy()
+				self.__dict__ = copy(args[0].__dict__)
 			else:
 				raise ValueError("Invalid argument type in DeliveryAgent.__init__(). *args only accepts a User object")
 		else:
@@ -196,7 +197,7 @@ class Customer(User):
 		"""
 		if len(args) == 1:			# Make a shallow copy of the User object pass in
 			if type(args[0]) is User:
-				self.__dict__ = args[0].__dict__.copy()
+				self.__dict__ = copy(args[0].__dict__) 		# shallow copy
 			else:
 				raise ValueError("Invalid argument type in Customer.__init__(). *args only accepts a User object")
 		else:
