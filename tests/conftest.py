@@ -1,5 +1,10 @@
-from unittest.mock import patch, MagicMock
+import sys
+from pathlib import Path
 import pytest
+from unittest.mock import MagicMock, patch
+
+# Add parent directory to Python path so tests can import from 'src'
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 """Creates a param that can be placed in each unit test function as the mock db"""
 @pytest.fixture
@@ -15,4 +20,3 @@ def mock_db():
         mock_db.command.return_value = {"ok": 1}
 
         yield mock_db
-
