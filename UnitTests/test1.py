@@ -1041,6 +1041,7 @@ from agent import (
 from user import User, DeliveryAgent
 
 #Creates a mock agent for testing
+"""
 def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca"):
     mock_server = make_mock_server_instance()
 
@@ -1060,7 +1061,23 @@ def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca"):
     # Also inject availability if needed
     agent._DeliveryAgent__availability_status = True
 
+    return agent """
+
+def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca", availability=True):
+    mock_server = make_mock_server_instance()
+
+    user = User(mock_server)
+    user._User__current_user = viu_id
+    user._User__role = "Agent"
+    user.name = name
+    user.email = email
+    user.VIUID = viu_id
+
+    agent = DeliveryAgent(mock_server, user)
+    agent._DeliveryAgent__availability_status = availability
+
     return agent
+
 
 
 class TestNotification(unittest.TestCase):
@@ -1250,7 +1267,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.print')
     def test_set_availability_no_change_when_user_declines(self, mock_print, mock_input):
         """Test doesn't change status when user enters 'n'"""
-        agent = make_mock_agent(_DeliveryAgent__availability_status=True)
+        agent = make_mock_agent(availability=True)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
@@ -1260,7 +1277,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.input', return_value='y')
     def test_set_availability_toggles_when_user_confirms(self, mock_input):
         """Test toggles availability when user enters 'y'"""
-        agent = make_mock_agent(_DeliveryAgent__availability_status=True)
+        agent = make_mock_agent(availability=True)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
@@ -1270,7 +1287,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.input', return_value='y')
     def test_set_availability_toggles_from_false_to_true(self, mock_input):
         """Test toggles from unavailable to available"""
-        agent = make_mock_agent(_DeliveryAgent__availability_status=False)
+        agent = make_mock_agent(availability=False)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
