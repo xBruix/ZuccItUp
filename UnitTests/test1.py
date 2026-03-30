@@ -1053,12 +1053,13 @@ def make_mock_agent(name="Test Agent", viuid="123456789", available=True):
 class TestNotification(unittest.TestCase):
     """Tests for notification functions"""
 
+    @patch('agent.Notification')
     def test_view_notifications_creates_notification_with_agent_name(self, mock_notif_class):
         """Test view_notifications creates Notification with agent's name"""
         mock_server = make_mock_server_instance()
         agent = make_mock_agent(name="John Doe")
         
-        _view_notifications(agent, mock_server)
+        agent._view_notifications(agent, mock_server)
         
         # Verify Notification was created with agent's name as customer_VIUID
         mock_notif_class.assert_called_once()
