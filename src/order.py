@@ -195,7 +195,7 @@ class Status(Enum):
 #──────────────────────────────────────────────
 
 
-class Order:
+class Order:   #Maybe remove the second server param since we already do it in svr?
 	def __init__(self, svr: Server, building: str, room: str, total: float, instructions: str, customer: str, vendor: str, server):
 		self.__server = svr
 		self.__building = building
