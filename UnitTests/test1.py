@@ -1036,19 +1036,30 @@ from agent import (
     _get_pending_orders,
     _print_order_table
 )
+from user import User, DeliveryAgent
 
 #Creates a mock agent for testing
-def make_mock_agent(name="Test Agent", viuid="123456789", available=True):
-    """Helper to create mock DeliveryAgent"""
-    from user import DeliveryAgent  #in user.py there is class DeliveryAgent(user) might need to change import
-    agent = DeliveryAgent(          #I think it src.user fixes the squiggles but the tests above have them and they run fine
-        availibilityStatus=available,
-        VIUID=viuid,
-        name=name,
-        email=f"{viuid}@viu.ca",
-        role="Agent"
-    )
+def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca"):
+    mock_server = make_mock_server_instance()
+
+    # Create a base User object
+    user = User(mock_server)
+
+    # Inject attributes normally set during login/signup
+    user._User__current_user = viu_id
+    user._User__role = "Agent"
+    user.name = name
+    user.email = email
+    user.VIUID = viu_id
+
+    # Create DeliveryAgent from the User object (shallow copy path)
+    agent = DeliveryAgent(mock_server, user)
+
+    # Also inject availability if needed
+    agent._DeliveryAgent__availability_status = True
+
     return agent
+
 
 class TestNotification(unittest.TestCase):
     """Tests for notification functions"""
