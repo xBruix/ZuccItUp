@@ -1070,7 +1070,7 @@ class TestNotification(unittest.TestCase):
         mock_server = make_mock_server_instance()
         agent = make_mock_agent(name="John Doe")
         
-        agent._view_notifications(agent, mock_server)
+        _view_notifications(agent, mock_server)
         
         # Verify Notification was created with agent's name as customer_VIUID
         mock_notif_class.assert_called_once()
