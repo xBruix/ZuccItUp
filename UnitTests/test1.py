@@ -1206,7 +1206,40 @@ class TestPrintOrderTable(unittest.TestCase):
         # Should print at least 4 lines (header + separator + 2 orders)
         self.assertGreaterEqual(mock_print.call_count, 4)
 
+# ── VIEW PENDING ORDERS TESTS ───────────────────────────────────────────────────────
 
+class TestViewPendingOrders(unittest.TestCase):
+    
+    #"""Tests for _view_pending_orders"""
+
+    @patch('agent._print_order_table')
+    @patch('agent._get_pending_orders')
+    def test_view_pending_orders_shows_message_when_none(self, mock_get, mock_print_table):
+        #"""Test prints message when no pending orders"""
+        mock_server = make_mock_server_instance()
+        agent = make_mock_agent()
+        mock_get.return_value = []
+        
+        with patch('builtins.print') as mock_print:
+            _view_pending_orders(agent, mock_server)
+            
+            # Check for "No pending orders" message
+            printed = [str(c) for c in mock_print.call_args_list]
+            message_found = any("No pending orders" in str(c) for c in printed)
+            self.assertTrue(message_found)
+
+    @patch('agent._print_order_table')
+    @patch('agent._get_pending_orders')
+    def test_view_pending_orders_displays_table_when_orders_exist(self, mock_get, mock_print_table):
+        #Test displays table when pending orders exist"""
+        mock_server = make_mock_server_instance()
+        agent = make_mock_agent()
+        fake_orders = [{"_id": "1", "orderStatus": "Pending"}]
+        mock_get.return_value = fake_orders
+        
+        _view_pending_orders(agent, mock_server)
+        
+        mock_print_table.assert_called_once_with(fake_orders)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
