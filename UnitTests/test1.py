@@ -1078,7 +1078,17 @@ class TestNotification(unittest.TestCase):
         self.assertEqual(call_kwargs["customer_VIUID"], "John Doe")
         self.assertEqual(call_kwargs["server"], mock_server)
 
-
+    @patch('agent.Notification')
+    def test_view_notifications_calls_viewNotification(self, mock_notif_class):
+        """Test view_notifications calls viewNotification method"""
+        mock_server = make_mock_server_instance()
+        agent = make_mock_agent()
+        mock_instance = MagicMock()
+        mock_notif_class.return_value = mock_instance
+        
+        _view_notifications(agent, mock_server)
+        
+        mock_instance.viewNotification.assert_called_once()
 
 # ══════════════════════════════════════════════════════════════════════════════
 
