@@ -1250,7 +1250,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.print')
     def test_set_availability_no_change_when_user_declines(self, mock_print, mock_input):
         """Test doesn't change status when user enters 'n'"""
-        agent = make_mock_agent(available=True)
+        agent = make_mock_agent(_DeliveryAgent__availability_status=True)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
@@ -1260,7 +1260,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.input', return_value='y')
     def test_set_availability_toggles_when_user_confirms(self, mock_input):
         """Test toggles availability when user enters 'y'"""
-        agent = make_mock_agent(available=True)
+        agent = make_mock_agent(_DeliveryAgent__availability_status=True)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
@@ -1270,7 +1270,7 @@ class TestSetAvailability(unittest.TestCase):
     @patch('builtins.input', return_value='y')
     def test_set_availability_toggles_from_false_to_true(self, mock_input):
         """Test toggles from unavailable to available"""
-        agent = make_mock_agent(available=False)
+        agent = make_mock_agent(_DeliveryAgent__availability_status=False)
         agent.setAvailability = MagicMock()
         
         _set_availability(agent)
