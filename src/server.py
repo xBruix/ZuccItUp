@@ -243,7 +243,7 @@ class Server:
 		# I guess it could be useful to get a list of all available menu items....
 		# But the way this is described in the comments is that it's supposed to display all menus...
 		# We have get_all_menus() for that.
-		"""result = self.__menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
+		result = self.__menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
 				{"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
 				{"$project": {                                   #selects the fields we want to output
 					"name": "$menuItem.name",
@@ -254,7 +254,7 @@ class Server:
 					"menuType": "$type",                         #pulling these two fields from the menu document to find the location and menuType for each item
 				}},
 				{"$sort": {"vendor": 1, "menuType": 1, "name": 1}} #sorts the results by vendor, then menuType and then name alphabetically, grouping the output logically by place, type and such
-			])"""
+			])
 
 		return result.to_list()
 
