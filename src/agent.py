@@ -259,9 +259,11 @@ def _get_pending_orders(server) -> list:
     #find any pending orders
     #create object for view_all
     temp = Order(
+
+        server, #added by KW
         building="", room="", total=0.0,
         instructions="", customer="", vendor="",
-        server=server,
+        #server=server,   removed by KW
     )
     all_orders = temp.view_all_orders()
     #returns pending
