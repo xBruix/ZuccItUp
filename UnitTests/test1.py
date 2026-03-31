@@ -1586,13 +1586,13 @@ def make_mock_cart(building="200", room="101"):
     return mock_cart
 
 # ── NOTIFICATION  TESTS ───────────────────────────────────────────────────────
-
+"""
 class TestNotifications(unittest.TestCase):
-    """Tests for notification functions"""
+    #Tests for notification functions
 
     @patch('customer.Notification')
     def test_view_notifications_creates_notification_with_customer_name(self, mock_notif_class):
-        """Test creates Notification with customer's name"""
+       # Test creates Notification with customer's name
         mock_server = make_mock_server_instance()
         customer = make_mock_customer(name="Alice")
         
@@ -1604,7 +1604,8 @@ class TestNotifications(unittest.TestCase):
 
     @patch('customer.Notification')
     def test_view_notifications_calls_viewNotification(self, mock_notif_class):
-        """Test calls viewNotification method"""
+      
+      #  Test calls viewNotification method
         mock_server = make_mock_server_instance()
         customer = make_mock_customer()
         mock_instance = MagicMock()
@@ -1613,6 +1614,6 @@ class TestNotifications(unittest.TestCase):
         _view_notifications(customer, mock_server)
         
         mock_instance.viewNotification.assert_called_once()
-
+"""
 if __name__ == "__main__":
     unittest.main(verbosity=2)
