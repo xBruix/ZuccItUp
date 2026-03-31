@@ -796,15 +796,16 @@ class TestOrder(unittest.TestCase):
         if mock_server is None:
             mock_server = make_mock_server_instance()
         # [BUG-2] 'svr' is overwritten by 'server' — we pass same mock for both
-        return Order(
-            mock_server,
-            "200",
-            "101",
-            10.0,
-            "",
-            "Alice",
-            "Upper Cafe"
+        order = Order(
+            mock_server,     # svr
+            "200",           # building
+            "315",           # room
+            12.50,           # total
+            "Extra hot",     # instructions
+            "111111111",     # customer
+            "Upper Cafe"     # vendor
         )
+        return order, mock_server
 
 
     # ── __init__ / getters ────────────────────────────────────────────────────
