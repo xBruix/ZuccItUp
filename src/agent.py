@@ -247,13 +247,18 @@ def _view_order_history(agent: DeliveryAgent, server):
             f"{loc}"
         )
 
-def _set_availability(agent: DeliveryAgent):
+def _set_availability(agent: DeliveryAgent):  #Logic change by KW added != "y" and added last 2 lines and changed current assignment
     #change availability
-    current = "available" if agent.availabilityStatus else "unavailable"
-    print(f"\nYou are currently {current}.")
+    current = agent.availabilityStatus  # True or False
+    print(f"\nYou are currently  {'available' if current else 'unavailable'}.")
     choice = input("Change status? (y/n): ").strip().lower()
-    if choice == "y":
-        agent.setAvailability(not agent.availabilityStatus)
+    if choice != "y":
+        print("Availability unchanged.")
+        return
+    new_status = not current
+    agent.setAvailability(new_status)
+
+
         
 def _get_pending_orders(server) -> list:
     #find any pending orders

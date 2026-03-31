@@ -1063,20 +1063,35 @@ def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca"):
 
     return agent """
 
-def make_mock_agent(name="John Doe", viu_id="123456789", email="john@viu.ca", availability=True):
+def make_mock_agent(
+    name="John Doe",
+    viu_id="123456789",
+    email="john@viu.ca",
+    availability=True
+):
     mock_server = make_mock_server_instance()
 
+    # Create a base User
     user = User(mock_server)
     user._User__current_user = viu_id
     user._User__role = "Agent"
+
+    # Public attributes used in agent.py
     user.name = name
     user.email = email
     user.VIUID = viu_id
 
+    # Create DeliveryAgent via shallow-copy constructor
     agent = DeliveryAgent(mock_server, user)
+
+    # Private attribute (real storage)
     agent._DeliveryAgent__availability_status = availability
 
+    # Public attribute used by setAvailability() and _set_availability()
+    agent.availabilityStatus = availability
+
     return agent
+
 
 
 
