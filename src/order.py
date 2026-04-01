@@ -324,9 +324,7 @@ class Order:   #Maybe remove the second server param since we already do it in s
 			customer=self.__customer,
 			vendor=self.__vendor,
 			cart=self.__cart,
-		)				
-  
-		self.__server.update_orderTime(self.__order_time, self.__order_id)
+		)
   
 		return True										#returns success to the caller
 
