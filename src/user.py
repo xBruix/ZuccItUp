@@ -97,7 +97,7 @@ class DeliveryAgent(User):
 		# Set availability status to false if the user instance if empty.
 		# Otherwise, find the user's availability status in the DB.
 		user_data = svr.view_user(self.__user_ref._current_user)
-		self.__availability_status = False if user_data is None else user_data["availabilityStatus"]
+		self.__availability_status = False if user_data is None else user_data.get["availabilityStatus"]
 
 	# @property is what's called a decorator.
 	# A decorator basically adds additional stuff to a function.
