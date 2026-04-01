@@ -22,6 +22,14 @@ STATUS_MESSAGES = {
         "Order Delivered",
         "Your order from {vendor} has been delivered by {agent}. Enjoy your meal!",
     ),
+    "Delivered": (
+        "Order Delivered",
+        "Your order from {vendor} has been delivered by {agent}. Please confirm receipt.",
+    ),
+    "Received": (
+        "Order Confirmed",
+        "Thank you! Your order from {vendor} has been confirmed as received.",
+    ),
 }                                                                       #this is to avoid db
 
 class Notification():
@@ -85,12 +93,12 @@ class Notification():
         for order in orders:                                            #iterating through all orders
             heading, description = self._build_message(order)           #running helper function for the notification
             
-            order_time = {
+            order_time = (
                 order.get("deliveryTime")
                 or order.get("acceptTime")
                 or order.get("orderTime")
                 or self.time                                            #iterating through to get what the current notification is on
-            }
+            )
             time_str = order_time.strftime("%Y-%m-%d %H:%M") if order_time else "Unknown time"
                                                                         #this line does a few things
                                                                         #it converts the datetime string to readable string strftime converts it to the YYYY-MM-DD HH-MM-SS i omitted the seconds

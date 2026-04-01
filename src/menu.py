@@ -90,6 +90,14 @@ class Menu():
                         f"{stock:<10}  "
                         f"{item.get('description', '')}"
                     )
+    def get_menus_for_vendor(self, vendor_name: str) -> list:
+        return self.server.get_all_menus(vendor_name=vendor_name)
+ 
+    def get_items_for_menu(self, vendor_name: str, menu_type: str) -> list:
+        menu_doc = self.server.get_one_menu(vendor_name, menu_type)
+        if not menu_doc:
+            return []
+        return menu_doc.get("menuItem", [])
 
 
 # MenuItem represents a single food item in a menu
