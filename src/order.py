@@ -100,16 +100,6 @@ class Cart:
 				total += item.get("price", 0.0) * qty
 			except (IndexError, TypeError, KeyError):
 				print(f"Warning: price for '{item_name}' not found in menu.")
-    
-			"""
-			result = list(self.__server.get_menu_item(item_name))	#for each item we check price
-	
-			if result:									#adding price accounting for the quantity
-				total += result[0]["price"] * qty	
-			
-			else:										#sanity check if price is not in the menu
-				print(f"Warning: price for '{item_name}' not found in menu.")
-            """
 		self.__subtotal = round(total, 2)
 		return self.__subtotal							#rounding the total and returning it so its a dollar amount $42.069 as a total does not make sense
 
@@ -398,21 +388,7 @@ class Order:   #Maybe remove the second server param since we already do it in s
 		self.__server.update_confirmationTime(time=self.__confirmation_time, order_id=self.__order_id)
  
 		print("Thank you! Order confirmed as received.")
-  
-	"""
-	def mark_complete(self):
-     
-		if not self.__order_id:
-			print("Order has not been placed yet.")
-			return										#yet another check for the system not to break completely
 
-		self.__delivery_time = datetime.now()			#marking delivery time
-		self.__order_status = Status.DELIVERED.value		#updaing the orderStatus
-		self.__server.update_order_status(order_id=self.__order_id, status=self.__order_status)
-		self.__server.update_orderTime(time=self.__delivery_time, order_id=self.__order_id)
-  
-		print("Order marked as complete.")				#messaging that the order is complete
-	"""
 	#not required accoring to me
 
 
