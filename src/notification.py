@@ -18,10 +18,6 @@ STATUS_MESSAGES = {
         "Order On Its Way",
         "Your order from {vendor} has been accepted by {agent} and is on its way!",
     ),
-    "Received": (
-        "Order Delivered",
-        "Your order from {vendor} has been delivered by {agent}. Enjoy your meal!",
-    ),
     "Delivered": (
         "Order Delivered",
         "Your order from {vendor} has been delivered by {agent}. Please confirm receipt.",
