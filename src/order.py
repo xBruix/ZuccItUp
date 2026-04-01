@@ -47,25 +47,13 @@ class Cart:
 		if quantity <= 0:
 			print("Quantity must be greater than 0.")	#avoiding troll inputs
 			return
-
-		"""
-		result = list(db.menu.aggregate([				#checks for availability and existence of the item. using $match combines the check
-			{"$unwind": "$menuItem"},					#unwinding the array of menuItem to separate menus
-			{"$match": {
-				"menuItem.name": {"$regex": f"^{menu_item}$", "$options": "i"},
-				"menuItem.inStock": True
-			}},
-			{"$project": {"name": "$menuItem.name"}},
-			{"$limit": 1}
-		]))
-		"""
 		try:
 			item = self.__server.get_menu_item(menu_item)
 		except (IndexError, TypeError, KeyError):
 			print(f"'{menu_item}' was not found in any menu.")
 			return
   
-		if not item.get("InStock"):
+		if not item.get("inStock"):
 			print(f"'{item.get('name', menu_item)}' is out of stock.")	#if it is not available it gives this message
 			return
 
@@ -324,7 +312,7 @@ class Order:   #Maybe remove the second server param since we already do it in s
 
 	def place_order(self) -> bool:
      
-		if not self.__cart_items:
+		if not self.__cart:
 			print("Cannot place an order with no items.")
 			return False								#sanity check for morons that want to order "nothing"
 
