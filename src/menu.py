@@ -17,25 +17,6 @@ class Menu():
     #search by menuItem
     def viewMenu(self):
         keyword = input("Search keyword (leave blank for all): ").strip() #Prompts the search term and removes any accidental spaces
- 
-        """ 
-        pipeline = [                         #building our mongodb pipeline
-            {"$match": {"type": self.type}}, #checking menu type
-            {"$unwind": "$menuItem"},        #unwinding the array of menuItem to separate menus
-        ]
-        if keyword:                          #checks for empty string
-            pipeline.append(                 #if keyword is present, filters items whose name field contains the keyword
-                {"$match": {"menuItem.name": {"$regex": keyword, "$options": "i"}}} #options makes it case-insensitive
-            )
-        pipeline.append({"$project": {       #parameters to select fields
-            "name": "$menuItem.name",        #all of these tell mangodb to output the field and pull the value from the db
-            "price": "$menuItem.price",
-            "description": "$menuItem.description",
-            "inStock": "$menuItem.inStock",
-            "allergens": "$menuItem.allergens",
-        }})
-        """
-                                                
         items = self.server.search_menu_items(menu_type=self.type, keyword=keyword or None) #changed to call server.py
         if not items:
             print("No items found.")         #if no menu is found then gives this message
@@ -120,21 +101,6 @@ class MenuItem():
         cart.add_to_cart(self.name, 1)                       #add cart if in stock
 
     def viewItem(self): 
-        """result = list(db.menu.aggregate([                    #runs aggregation pipeline against menu collection and converts it into a list
-            {"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
-            {"$match": {"menuItem.name": {"$regex": f"^{self.name}$", "$options": "i"}}}, #filters to where only the matching item remains
-            {"$project": {                                   #selects only the fields required and deletes the rest
-                "name": "$menuItem.name",
-                "price": "$menuItem.price",
-                "description": "$menuItem.description",
-                "inStock": "$menuItem.inStock",
-                "allergens": "$menuItem.allergens",          #from "name" till this line, pulls fields from the unwound menuItem and allows acess as just item["name"]
-                "location": "$location",
-                "menuType": "$type",                         #these two lines pull fields from the menu document to find location and menuType the item belongs
-            }},
-            {"$limit": 1}                                    #stops at the specific item
-        ]))"""
-
         menuItemID = input("Enter menu item name")
         result_cursor = self.server.get_menu_item(menuItemID)                  #kw
         result = list(result_cursor)
@@ -159,20 +125,6 @@ class MenuItem():
 
     # Returns or displays all menu items
     def viewAllItems(self):
-        """items = list(db.menu.aggregate([                     #runs the aggregation pipeline on the menu collection and converts it to the python list
-            {"$unwind": "$menuItem"},                        #unwinding the array of menuItem to separate menus
-            {"$project": {                                   #selects the fields we want to output
-                "name": "$menuItem.name",                    
-                "price": "$menuItem.price",
-                "description": "$menuItem.description",
-                "inStock": "$menuItem.inStock",              #pulls the four fields from the unwound menuItem in the form item["name"], item["price"] and such
-                "location": "$location",
-                "menuType": "$type",                         #pulling these two fields from the menu document to find the location and menuType for each item
-            }},
-            {"$sort": {"location": 1, "menuType": 1, "name": 1}} #sorts the results by location, then menuType and then name alphabetically, grouping the output logically by place, type and such
-        ]))"""
-
-    
         result_cursor = self.server.get_menu_item() #called with null to get all menu items
         items = list(result_cursor)     #kw
                                     #this works then we can remove the code above? Bruce

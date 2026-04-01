@@ -272,15 +272,6 @@ class Customer(User):
 			print(f"Customer with VIUID {self._current_user} already exists.")          #if it exists, why create??????
 			return None
 
-		"""
-		customer_doc = {
-			"name": self.name,
-			"email": self.email,
-			"VIUID": self.VIUID,
-			"role": self.role,
-			"previouslyOrdered": self.previouslyOrdered,
-		}  """                                                                  #details of the customer to add to the db
-
 		#result = db.user.insert_one(customer_doc)
 		result = self._server.create_user(self._email,self._name,self._current_user,"customer")        #kw
 		print(f"Customer '{self._name}' created successfully.")                  #done yay

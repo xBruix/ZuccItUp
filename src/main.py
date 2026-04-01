@@ -643,32 +643,7 @@ while True:
         break
  
     break    # Normal exit after run_customer/run_agent return (shouldn't happen without logout)
-"""
-# MAIN LOOP GOES HERE
-print("Welcome to Zucc It Up!")
-print("At any time, you can type 'quit' to close the program, or type 'logout' to logout of your account.")
-login_or_signup()
 
-if user.get_role() == "Customer":
-	customer = Customer(server, user)
-	# TODO: Enter Location (user location)
-	print("─" * 40, "\nLet's set up your location.")
-	your_building = input_str("Enter your building number\n> ", "^[1-4]\\d\\d$")
-	your_room = input_str("Enter your room number\n> ", "^[1-5]\\d\\d\\w?$")
-
-	# TODO: List options
-	customer_option = input_int("What do you want to do?\n1. Create an Order \n2. View Your Cart\n> ", 1, 2)
-	if customer_option == 1:	# Create an Order
-		# TODO: List vendors
-		num_vendors = customer.list_vendors()
-		# TODO: Customer selects vendor
-		# TODO: List menus for that vendor
-		# TODO: Customer selects a menu
-		# TODO: List menu items from that menu
-		pass
-	else:						# View your cart
-		pass
-"""
 print("Goodbye!")
 print("""
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣤⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
