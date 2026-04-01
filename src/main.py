@@ -358,8 +358,8 @@ def _confirm_received_flow(customer: Customer):
         customer=doc.get("customer",""),
         vendor=doc.get("vendor",""),
     )
-    order._Order__order_id = str(doc["_id"])
-    order._Order__order_status = doc.get("orderStatus","")
+    order.set_order_id(str(doc["_id"]))
+    order.set_status(doc.get("orderStatus",""))
     order.confirm_received()    # Step 2.13: status → Received
  
  
@@ -521,8 +521,8 @@ def _view_available_deliveries(agent: DeliveryAgent):
             customer=selected.get("customer",""),
             vendor=selected.get("vendor",""),
         )
-        order._Order__order_id = order_id
-        order._Order__order_status = selected.get("orderStatus","")
+        order.set_order_id(order_id)
+        order.set_status(selected.get("orderStatus", ""))
  
         order.accept_order(agent.get_name())    # Status → ReadyForPickup, acceptTime set
         _send_status_notification(order_id, selected.get("customer",""))
@@ -552,7 +552,7 @@ def _manage_order_in_progress(agent: DeliveryAgent, order_doc: dict):
         customer=order_doc.get("customer",""),
         vendor=order_doc.get("vendor",""),
     )
-    order._Order__order_id = order_id
+    order.set_order_id(order_id)
  
     while True:
         # Always fetch fresh status from DB so we reflect any external changes
@@ -561,7 +561,7 @@ def _manage_order_in_progress(agent: DeliveryAgent, order_doc: dict):
             print("Order not found.")
             return
         current_status = fresh_doc.get("orderStatus","")
-        order._Order__order_status = current_status
+        order.set_status(current_status)
  
         print(f"\n  {order_doc.get('vendor','')} → Bldg {order_doc.get('building','')}, Rm {order_doc.get('room','')}")
         print(f"  Customer: {order_doc.get('customer','')}  |  Status: {current_status}")

@@ -269,7 +269,12 @@ class Order:   #Maybe remove the second server param since we already do it in s
 #──────────────────────────────────────────────
 	def set_instructions(self, instructions: str):
 		self.__special_instructions = instructions
+  
+	def set_order_id(self, order_id: str):
+		self.__order_id = order_id				#added for main
 
+	def set_status(self, status: str):
+		self.__order_status = status			#added for main
 #──────────────────────────────────────────────
 # Other functions
 #──────────────────────────────────────────────
