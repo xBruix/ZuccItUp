@@ -243,7 +243,7 @@ def _cart_and_checkout(user_obj, cart: Cart) -> bool:
     instructions = input_str("Special instructions (press Enter to skip)\n> ")
  
     # Convert cart → one Order per vendor (spec: "potentially multiple orders")
-    orders = cart.convert_to_orders(user_obj.get_name(), instructions)
+    orders = cart.convert_to_orders(user_obj.get_current_user(), instructions)
     if not orders:
         print("No orders to place.")
         return False
@@ -262,7 +262,7 @@ def _cart_and_checkout(user_obj, cart: Cart) -> bool:
     for o in orders:
         if o.place_order():
             print(f"  ✓ Order placed with {o.get_vendor()} (ID: {o.get_order_id()})")
-            notif = Notification("", "", user_obj.get_name(), server, o.get_order_id())
+            notif = Notification("", "", user_obj.get_current_user(), server, o.get_order_id())
             notif.sendNotification()
  
     return True    # Signal to caller that ordering is done
