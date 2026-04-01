@@ -306,7 +306,7 @@ def _view_customer_orders(customer: Customer):
     """Display all orders placed by this customer."""
     my_orders = [
         o for o in server.get_all_orders()
-        if o.get("customer") == customer.get_name()
+        if o.get("customer") == customer.get_current_user()
     ]
     if not my_orders:
         print("\nYou have no order history.")
@@ -331,7 +331,7 @@ def _confirm_received_flow(customer: Customer):
     """
     delivered = [
         o for o in server.get_all_orders()
-        if o.get("customer") == customer.get_name()
+        if o.get("customer") == customer.get_current_user()
         and o.get("orderStatus") == Status.DELIVERED.value
     ]
     if not delivered:
@@ -368,7 +368,7 @@ def _view_customer_notifications(customer: Customer):
     Step 2.12: Show order status notifications for all customer orders.
     Notification messages are derived from live order status — no DB collection needed.
     """
-    notif = Notification("", "", customer.get_name(), server)
+    notif = Notification("", "", customer.get_current_user(), server)
     notif.viewNotification()
 #customer flow ends
  
